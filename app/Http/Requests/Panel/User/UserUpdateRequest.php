@@ -1,0 +1,48 @@
+<?php
+
+namespace App\Http\Requests\Panel\User;
+
+use App\Models\User;
+use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+/**
+ * @property User   $user
+ * @property string $city_id
+ * @property string $role_id
+ */
+class UserUpdateRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return $this->user()->can('PanelUpdate', $this->user);
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'phone'     => [
+                'required',
+                'string',
+                Rule::unique('users', 'phone')->ignore($this->user),
+            ],
+            'full_name' => 'nullable|string',
+            'username'  => [
+                'nullable',
+                'string',
+                Rule::unique('users', 'username')->ignore($this->user),
+            ],
+            'city_id'   => 'required|exists:cities,id',
+            'role_id'   => 'required|string|exists:roles,uuid',
+        ];
+    }
+}

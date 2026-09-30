@@ -1,49 +1,163 @@
 <?php
 
-namespace App\Http\Controllers\Panel\User;
+namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\Panel\User\UserChangePasswordRequest;
+use App\Http\Requests\Panel\User\UserIndexRequest;
+use App\Http\Requests\Panel\User\UserListRequest;
+use App\Http\Requests\Panel\User\UserStoreRequest;
+use App\Http\Requests\Panel\User\UserUpdateRequest;
+use App\Http\Resources\Panel\User\UserIndexResource;
+use App\Http\Resources\Panel\User\UserListResource;
+use App\Http\Resources\Panel\User\UserShowResource;
+use Illuminate\Support\Facades\Gate;
+use App\Models\User;
+use App\Models\Role;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(UserIndexRequest $request): JsonResponse
     {
-        //
+        $perPage = $request->integer('per_page', 10);
+
+        $users = User::query();
+
+        if ($request->has('search')) {
+            $search = '%' . $request->string('search')->trim() . '%';
+            $users->where(function ($query) use ($search) {
+                $query->where('full_name', 'like', $search)
+                    ->orWhere('phone', 'like', $search)
+                    ->orWhere('username', 'like', $search);
+            });
+        }
+
+        if ($request->has('city') && $request->city != null) {
+            $users->where('city_id', $request->string('city'));
+        }
+
+        if ($request->has('role') && $request->role != null) {
+            $users->whereHas('roles', function ($query) use ($request) {
+                $query->where('uuid', $request->string('role'));
+            });
+        }
+
+        $users = $users->paginate($perPage)
+            ->withQueryString();
+
+        return $this->collection(UserIndexResource::collection($users), __('responses.users.index'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(UserStoreRequest $request): JsonResponse
     {
-        //
+        $validated = $request->only([
+            'phone', 'full_name', 'username',
+            'password', 'city_id', 'role_id'
+        ]);
+
+        try {
+            $role = Role::query()->where('uuid', $request->role_id)->first();
+
+            $user = new User();
+            $user->fill($validated);
+            $user->city()->associate($request->city_id);
+            $user->save();
+
+            $user->assignRole($role);
+
+            return $this->success($user, __('responses.users.store'));
+        } catch (\Exception $exception) {
+            Log::error($exception->getMessage());
+
+            return $this->error($exception->getMessage());
+        }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(User $user): JsonResponse
     {
-        //
+        if (Gate::denies('PanelShow', $user)) {
+            abort(403, __('responses.unauthorized'));
+        }
+
+        $user->load('roles');
+        return $this->resource(new UserShowResource($user), __('responses.users.show'), 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UserUpdateRequest $request, User $user): JsonResponse
     {
-        //
+        $validated = $request->only([
+            'phone', 'full_name', 'username',
+            'city_id', 'role_id'
+        ]);
+
+        try {
+            $role = Role::query()->where('uuid', $request->role_id)->firstOrFail();
+
+            $user->fill($validated);
+            $user->city()->associate($request->city_id);
+            $user->assignRole($role);
+            $user->save();
+
+            return $this->success($user, __('responses.users.update'));
+        } catch (\Exception $exception) {
+            Log::error($exception->getMessage());
+
+            return $this->error($exception->getMessage());
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(User $user): JsonResponse
     {
-        //
+        if (Gate::denies('PanelDelete', $user)) {
+            abort(403, __('responses.unauthorized'));
+        }
+
+        $user->delete();
+
+        return $this->success(message: __('responses.users.destroy'));
+    }
+
+    /**
+     * List the resource.
+     */
+    public function list(UserListRequest $request): JsonResponse
+    {
+        $users = User::query();
+
+        if ($request->has('role')) {
+            $users->whereHas('roles', function ($query) use ($request) {
+                $query->where('name', $request->role);
+            });
+        }
+
+        $users = $users->get();
+
+        return $this->collection(UserListResource::collection($users), __('responses.users.list'));
+    }
+
+    public function changePassword(UserChangePasswordRequest $request, User $user): JsonResponse
+    {
+        $user->update([
+            'password' => $request->password,
+        ]);
+
+        return $this->success(message: __('responses.users.change_password'));
     }
 }

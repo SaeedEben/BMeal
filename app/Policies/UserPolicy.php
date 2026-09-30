@@ -3,63 +3,63 @@
 namespace App\Policies;
 
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class UserPolicy
 {
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user): bool
+    public function PanelIndex(User $user) :bool
     {
-        return false;
+        return $user->can('panel.user.index', User::class);
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, User $model): bool
-    {
-        return false;
-    }
 
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function PanelStore(User $user) :bool
     {
-        return false;
+        return $user->can('panel.user.store', User::class);
+    }
+
+
+    /**
+     * Determine whether the user can view the model.
+     */
+    public function PanelShow(User $user, User $model) :bool
+    {
+        return $user->can('panel.user.show', $model);
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, User $model): bool
+    public function PanelUpdate(User $user, User $model) :bool
     {
-        return false;
+        return $user->can('panel.user.update', $model);
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, User $model): bool
+    public function PanelDelete(User $user, User $model) :bool
     {
-        return false;
+        return $user->can('panel.user.destroy', $model);
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, User $model): bool
+    public function PanelList(User $user) :bool
     {
-        return false;
+        return $user->can('panel.user.list', User::class);
     }
 
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, User $model): bool
+     public function PanelChangeStatus(User $user, User $model) :bool
     {
-        return false;
+        return $user->can('panel.user.change_status', $model);
+    }
+
+     public function PanelChangePassword(User $user, User $model) :bool
+    {
+        return $user->can('panel.user.change_password', $model);
     }
 }
