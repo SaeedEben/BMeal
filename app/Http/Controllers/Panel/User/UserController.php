@@ -32,13 +32,8 @@ class UserController extends Controller
             $search = '%' . $request->string('search')->trim() . '%';
             $users->where(function ($query) use ($search) {
                 $query->where('full_name', 'like', $search)
-                    ->orWhere('phone', 'like', $search)
-                    ->orWhere('username', 'like', $search);
+                    ->orWhere('email', 'like', $search);
             });
-        }
-
-        if ($request->has('city') && $request->city != null) {
-            $users->where('city_id', $request->string('city'));
         }
 
         if ($request->has('role') && $request->role != null) {
