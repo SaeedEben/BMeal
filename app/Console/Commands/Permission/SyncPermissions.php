@@ -18,7 +18,7 @@ class SyncPermissions extends Command
      */
     public function handle()
     {
-        $file = config('RolePermissions');
+        $file = config('users_permissions');
 
         $allPermissions = [];
         $key            = 0;
@@ -47,7 +47,7 @@ class SyncPermissions extends Command
 
         $role->syncPermissions($createdPermissions);
 
-        $admin = User::query()->where('phone' , 'saeed@gmail.com')->first();
+        $admin = User::query()->where('email' , 'saeed@gmail.com')->first();
         $admin->assignRole($role);
     }
 }
