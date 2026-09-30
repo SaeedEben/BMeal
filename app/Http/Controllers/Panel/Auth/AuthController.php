@@ -3,36 +3,32 @@
 namespace App\Http\Controllers\Panel\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\Panel\Auth\LoginRequest;
+use App\Http\Requests\Panel\Auth\LogoutRequest;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
-
         if (!Auth::attempt($request->only('email', 'password'))) {
-            return $this->error('Invalid credentials', 401);
+            return $this->error(__('responses.errors.auth.login_failed'), 401);
         }
 
         $user = Auth::user();
-        $token = $request()->user()->createToken('auth_token')->plainTextToken;
+        $token = $request->user()->createToken('auth_token')->plainTextToken;
 
         return $this->success([
             'access_token' => $token,
-            'token_type' => 'Bearer',
-            'user' => $user,
-        ]);
+            'token_type'   => 'Bearer',
+            'user'         => $user,
+        ], __('responses.auth.login'));
     }
 
-    public function logout(Request $request)
+    public function logout(LogoutRequest $request)
     {
         $request->user()->currentAccessToken()->delete();
 
-        return $this->success(null, 'Logout successful');
+        return $this->success(null, __('responses.auth.logout'));
     }
 }

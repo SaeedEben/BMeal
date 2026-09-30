@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Panel;
+namespace App\Http\Controllers\Panel\User;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Panel\User\UserChangePasswordRequest;

@@ -24,6 +24,8 @@
     "autoload": {
         "psr-4": {
             "App\\": "app/",
+            "App\\Http\\Controllers\\Auth\\": "app/Http/Controllers/Api/Auth/",
+            "App\\Http\\Requests\\Auth\\": "app/Http/Requests/Api/Auth/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
         }
