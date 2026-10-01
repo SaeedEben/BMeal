@@ -8,7 +8,8 @@ return [
         ]
     ],
     'auth' => [
-        'login'  => 'Welcome...',
-        'logout' => 'Logout Successfully.'
+        'login'   => 'Welcome...',
+        'logout'  => 'Logout Successfully.',
+        'profile' => 'User profile data',
     ],
 ];

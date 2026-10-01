@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Enum\Common\StatusEnum;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -14,6 +15,7 @@ use Spatie\Permission\Traits\HasRoles;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Symfony\Component\Uid\Uuid;
+use Illuminate\Support\Collection;
 
 /**
  * @property      Uuid|string       $id
@@ -62,7 +64,35 @@ class User extends Authenticatable
     }
 
     // {Relations} --------------------------------------------
+     public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Role::class,
+            'model_has_roles',
+            'model_id',
+            'role_id',
+            'id',
+            'uuid'
+        )->where('model_type', self::class);
+    }
+    
     // {Attributes} -------------------------------------------
     // {Methods} ----------------------------------------------
+    public function assignRole(Role $role): void
+    {
+        $this->roles()->syncWithoutDetaching([
+            $role->uuid => [
+                'model_type' => self::class,
+            ],
+        ]);
+    }
+
+    public function getPermissionsByRole(): Collection
+    {
+        return $this->roles
+            ->flatMap(fn ($role) => $role->permissions)
+            ->unique();
+    }
+
     // {Scopes} -----------------------------------------------
 }
