@@ -1,0 +1,11 @@
+{
+    "mcpServers": {
+        "laravel-boost": {
+            "command": "/opt/homebrew/Cellar/php/8.5.1_1/bin/php",
+            "args": [
+                "/Users/saeedmacbook/Developer/Projects/1405/MealPlanner/BMeal/artisan",
+                "boost:mcp"
+            ]
+        }
+    }
+}
