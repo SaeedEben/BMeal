@@ -12,7 +12,8 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function () {
-            Route::prefix('panel')
+            Route::middleware('api')
+                ->prefix('panel')
                 ->name('panel.')
                 ->group(base_path('routes/panel.php'));
 
@@ -22,7 +23,8 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
-         $middleware->api(prepend: [\Illuminate\Http\Middleware\HandleCors::class]);
+        //  $middleware->api(prepend: [\Illuminate\Http\Middleware\HandleCors::class]);
+
          $middleware->alias([
             'role'               => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission'         => \Spatie\Permission\Middleware\PermissionMiddleware::class,

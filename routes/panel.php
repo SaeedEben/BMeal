@@ -12,7 +12,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::group(['middleware' => ['auth:sanctum', 'role:admin']], function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/profile', [ProfileController::class, 'profile']);
-        
+
         // User ------------------------------------------------------------------------
         Route::get('/users/list', [UserController::class, 'list']);
         Route::post('/users/change_password/{user}', [UserController::class, 'changePassword']);

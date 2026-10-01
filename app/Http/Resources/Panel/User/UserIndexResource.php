@@ -20,14 +20,12 @@ class UserIndexResource extends JsonResource
     {
         return [
             'id'          => $this->id,
-            'phone'       => $this->phone,
+            'email'       => $this->email,
             'full_name'   => $this->full_name,
-            'username'    => $this->username,
-            'city'        => $this->city->name,
             'role'        => $this->roles()->first()?->name,
-            'last_active' => verta($this->last_active)->format('Y-m-d H:i'),
-            'created_at'  => verta($this->created_at)->format('Y-m-d H:i'),
-            'updated_at'  => verta($this->updated_at)->format('Y-m-d H:i'),
+            'last_active' => $this->last_active,
+            'created_at'  => $this->created_at,
+            'updated_at'  => $this->updated_at,
         ];
     }
 }

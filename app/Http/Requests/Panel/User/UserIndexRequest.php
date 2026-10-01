@@ -25,7 +25,6 @@ class UserIndexRequest extends FormRequest
     {
         return [
             'search'   => 'nullable|string',
-            'city'     => 'nullable|string|exists:cities,id',
             'role'     => 'nullable|string|exists:roles,uuid',
             'per_page' => 'nullable|integer|min:1|max:100',
         ];

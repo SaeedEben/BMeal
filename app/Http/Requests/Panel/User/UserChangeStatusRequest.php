@@ -5,7 +5,7 @@ namespace App\Http\Requests\Panel\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\User;
-use App\Enum\User\UserStatusEnum;
+use App\Enum\Common\StatusEnum;
 /**
  * @property User $user
  * @property string $status
@@ -28,7 +28,7 @@ class UserChangeStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "status"    => 'required|string|in:' . implode(',', array_column(UserStatusEnum::cases(), 'value')),
+            "status"    => 'required|string|in:' . implode(',', array_column(StatusEnum::cases(), 'value')),
         ];
     }
 }

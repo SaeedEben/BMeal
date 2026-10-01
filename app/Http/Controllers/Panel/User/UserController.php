@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Gate;
 use App\Models\User;
 use App\Models\Role;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
@@ -54,8 +55,8 @@ class UserController extends Controller
     public function store(UserStoreRequest $request): JsonResponse
     {
         $validated = $request->only([
-            'phone', 'full_name', 'username',
-            'password', 'city_id', 'role_id'
+            'email', 'full_name',
+            'password', 'role_id'
         ]);
 
         try {
@@ -63,7 +64,6 @@ class UserController extends Controller
 
             $user = new User();
             $user->fill($validated);
-            $user->city()->associate($request->city_id);
             $user->save();
 
             $user->assignRole($role);
@@ -82,7 +82,7 @@ class UserController extends Controller
     public function show(User $user): JsonResponse
     {
         if (Gate::denies('PanelShow', $user)) {
-            abort(403, __('responses.unauthorized'));
+            abort(403, __('responses.errors.unauthorized'));
         }
 
         $user->load('roles');
@@ -95,15 +95,14 @@ class UserController extends Controller
     public function update(UserUpdateRequest $request, User $user): JsonResponse
     {
         $validated = $request->only([
-            'phone', 'full_name', 'username',
-            'city_id', 'role_id'
+            'email', 'full_name',
+            'role_id'
         ]);
 
         try {
             $role = Role::query()->where('uuid', $request->role_id)->firstOrFail();
 
             $user->fill($validated);
-            $user->city()->associate($request->city_id);
             $user->assignRole($role);
             $user->save();
 
@@ -121,7 +120,7 @@ class UserController extends Controller
     public function destroy(User $user): JsonResponse
     {
         if (Gate::denies('PanelDelete', $user)) {
-            abort(403, __('responses.unauthorized'));
+            abort(403, __('responses.errors.unauthorized'));
         }
 
         $user->delete();

@@ -19,8 +19,7 @@ class UserListResource extends JsonResource
     {
         return [
             "value"    => $this->id,
-            "label"    => $this->phone,
-            "username" => $this->username,
+            "label"    => $this->email,
         ];
     }
 }

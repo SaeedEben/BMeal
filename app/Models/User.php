@@ -34,6 +34,12 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, HasRoles, HasUuids, Notifiable;
 
+    protected $primaryKey = 'id';
+
+    public $incrementing = false;
+
+    protected $keyType = 'string';
+
     /**
      * Get the attributes that should be cast.
      *
@@ -47,12 +53,17 @@ class User extends Authenticatable
         'status',
     ];
 
+    protected $hidden = [
+        'password',
+        'remember_token'
+    ];
+
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'status' => StatusEnum::class,
+            'password'          => 'hashed',
+            'status'            => StatusEnum::class,
         ];
     }
 
