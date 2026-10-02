@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\Panel\User;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Panel\User\UserChangePasswordRequest;
-use App\Http\Requests\Panel\User\UserIndexRequest;
-use App\Http\Requests\Panel\User\UserListRequest;
-use App\Http\Requests\Panel\User\UserStoreRequest;
-use App\Http\Requests\Panel\User\UserUpdateRequest;
-use App\Http\Resources\Panel\User\UserIndexResource;
-use App\Http\Resources\Panel\User\UserListResource;
-use App\Http\Resources\Panel\User\UserShowResource;
+use App\Http\Requests\Panel\User\User\UserChangePasswordRequest;
+use App\Http\Requests\Panel\User\User\UserIndexRequest;
+use App\Http\Requests\Panel\User\User\UserListRequest;
+use App\Http\Requests\Panel\User\User\UserStoreRequest;
+use App\Http\Requests\Panel\User\User\UserUpdateRequest;
+use App\Http\Resources\Panel\User\User\UserIndexResource;
+use App\Http\Resources\Panel\User\User\UserListResource;
+use App\Http\Resources\Panel\User\User\UserShowResource;
 use Illuminate\Support\Facades\Gate;
 use App\Models\User\User;
 use App\Models\User\Role;
