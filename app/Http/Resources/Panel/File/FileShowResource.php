@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Resources\Panel\Country;
+namespace App\Http\Resources\Panel\File;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CountryListResource extends JsonResource
+class FileShowResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,9 +14,6 @@ class CountryListResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
-            'value' => $this->id,
-            'label' => $this->name,
-        ];
+        return parent::toArray($request);
     }
 }

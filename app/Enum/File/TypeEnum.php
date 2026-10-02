@@ -6,6 +6,7 @@ enum TypeEnum: string
 {
     case PROFILE_PHOTO = 'profile_photo';
     case MEAL_PHOTO    = 'meal_photo';
+    case COUNTRY_FLAG  = 'country_flag';
 
     public function label(): string
     {
