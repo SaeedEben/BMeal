@@ -12,10 +12,9 @@ use App\Http\Resources\Panel\User\UserIndexResource;
 use App\Http\Resources\Panel\User\UserListResource;
 use App\Http\Resources\Panel\User\UserShowResource;
 use Illuminate\Support\Facades\Gate;
-use App\Models\User;
-use App\Models\Role;
+use App\Models\User\User;
+use App\Models\User\Role;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller

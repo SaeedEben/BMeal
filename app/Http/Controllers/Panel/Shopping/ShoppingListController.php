@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Panel\Recipe;
+namespace App\Http\Controllers\Panel\Shopping;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class CategoryController extends Controller
+class ShoppingListController extends Controller
 {
      /**
      * Display a listing of the countries.
