@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('slug', 220)->unique();
             $table->text('description')->nullable();
             $table->string('image', 500)->nullable();
+            $table->string('meal_type', 100)->nullable();
 
             $table->unsignedSmallInteger('prep_time_minutes')->nullable();
             $table->unsignedSmallInteger('cook_time_minutes')->nullable();

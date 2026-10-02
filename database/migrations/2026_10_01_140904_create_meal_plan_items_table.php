@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreignId('meal_plan_id')->constrained('meal_plans')->cascadeOnDelete();
             $table->foreignUuid('recipe_id')->constrained('recipes')->cascadeOnDelete();
             $table->date('date');
-            $table->foreignUuid('meal_type_id')->constrained('meal_types')->restrictOnDelete();
 
             $table->unsignedSmallInteger('servings')->nullable()->default(1);
 
