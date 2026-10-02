@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('recipes', function (Blueprint $table) {
             $table->uuid('id')->primary();
 
-            $table->foreignUuid('country_id')->constrained('countries')->nullOnDelete();
+            $table->foreignUuid('country_id')->nullable()->constrained('countries')->nullOnDelete();
 
             $table->string('name', 200);
             $table->string('slug', 220)->unique();

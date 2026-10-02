@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('recipe_ingredients', function (Blueprint $table) {
             $table->uuid('id')->primary();
 
-            $table->foreignUuid('recipe_id')->constrained('recipes')->nullOnDelete();
-            $table->foreignUuid('ingredient_id')->constrained('ingredients')->nullOnDelete();
+            $table->foreignUuid('recipe_id')->constrained('recipes')->cascadeOnDelete();
+            $table->foreignUuid('ingredient_id')->constrained('ingredients')->cascadeOnDelete();
 
             $table->foreignUuid('unit_id')->nullable()->constrained('units')->nullOnDelete();
 

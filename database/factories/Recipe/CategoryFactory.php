@@ -1,14 +1,14 @@
 <?php
 
-namespace Database\Factories;
+namespace Database\Factories\Recipe;
 
-use App\Models\Ingredient;
+use App\Models\Recipe\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Ingredient>
+ * @extends Factory<Category>
  */
-class IngredientFactory extends Factory
+class CategoryFactory extends Factory
 {
     /**
      * Define the model's default state.

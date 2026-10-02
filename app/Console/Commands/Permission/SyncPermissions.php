@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands\Permission;
 
-use App\Models\Permission;
-use App\Models\Role;
-use App\Models\User;
+use App\Models\User\Permission;
+use App\Models\User\Role;
+use App\Models\User\User;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('meal_plan_items', function (Blueprint $table) {
             $table->uuid('id')->primary();
 
-            $table->foreignId('meal_plan_id')->constrained('meal_plans')->cascadeOnDelete();
+            $table->foreignUuid('meal_plan_id')->constrained('meal_plans')->cascadeOnDelete();
             $table->foreignUuid('recipe_id')->constrained('recipes')->cascadeOnDelete();
             $table->date('date');
 

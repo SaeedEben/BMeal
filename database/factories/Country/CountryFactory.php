@@ -1,14 +1,14 @@
 <?php
 
-namespace Database\Factories;
+namespace Database\Factories\Country;
 
-use App\Models\File;
+use App\Models\Country\Country;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<File>
+ * @extends Factory<Country>
  */
-class FileFactory extends Factory
+class CountryFactory extends Factory
 {
     /**
      * Define the model's default state.

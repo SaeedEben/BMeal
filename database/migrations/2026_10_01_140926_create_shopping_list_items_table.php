@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('shopping_list_items', function (Blueprint $table) {
             $table->uuid('id')->primary();
 
-            $table->foreignId('shopping_list_id')->constrained('shopping_lists')->cascadeOnDelete();
+            $table->foreignUuid('shopping_list_id')->constrained('shopping_lists')->cascadeOnDelete();
             $table->foreignUuid('ingredient_id')->nullable()->constrained('ingredients')->nullOnDelete();
 
             $table->string('name', 150);

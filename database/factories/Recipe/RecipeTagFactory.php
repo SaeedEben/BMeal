@@ -1,14 +1,14 @@
 <?php
 
-namespace Database\Factories;
+namespace Database\Factories\Recipe;
 
-use App\Models\UserFavorite;
+use App\Models\Recipe\RecipeTag;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<UserFavorite>
+ * @extends Factory<RecipeTag>
  */
-class UserFavoriteFactory extends Factory
+class RecipeTagFactory extends Factory
 {
     /**
      * Define the model's default state.
