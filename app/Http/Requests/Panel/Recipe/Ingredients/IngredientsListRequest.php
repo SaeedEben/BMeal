@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Panel\Recipe\Ingredients;
 
+use App\Models\Recipe\Ingredient;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,7 +13,7 @@ class IngredientsListRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user()->can('PanelList', Ingredient::class);
     }
 
     /**

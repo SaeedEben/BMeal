@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Panel\Recipe\Ingredients;
 
+use App\Enum\Common\StatusEnum;
+use App\Models\Recipe\Ingredient;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,7 +14,7 @@ class IngredientsStoreRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user()->can('PanelStore', Ingredient::class);
     }
 
     /**
@@ -23,7 +25,10 @@ class IngredientsStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => 'required|string|max:150',
+            'slug' => 'required|string|max:150|unique:ingredients,slug',
+            'description' => 'nullable|string',
+            'status' => 'nullable|string|in:'.implode(',', StatusEnum::values()),
         ];
     }
 }

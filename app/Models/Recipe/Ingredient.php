@@ -3,17 +3,15 @@
 namespace App\Models\Recipe;
 
 use App\Enum\Common\StatusEnum;
+use App\Models\Shopping\ShoppingListItem;
 use Carbon\Carbon;
-use Database\Factories\IngredientFactory;
+use Database\Factories\Recipe\IngredientFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Symfony\Component\Uid\Uuid;
-use App\Models\Recipe\RecipeIngredients;
-use App\Models\Shopping\ShoppingListItem;
-
 
 /**
  * @property Uuid|string $id

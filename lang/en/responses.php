@@ -67,4 +67,13 @@ return [
         'update'  => 'Unit updated successfully.',
         'destroy' => 'Unit deleted successfully.',
     ],
+
+    // {Ingredient} ----------------------------------------------
+    'ingredients' => [
+        'index'   => 'Ingredients list',
+        'show'    => 'Ingredient data',
+        'store'   => 'Ingredient created successfully.',
+        'update'  => 'Ingredient updated successfully.',
+        'destroy' => 'Ingredient deleted successfully.',
+    ],
 ];

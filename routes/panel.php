@@ -4,6 +4,7 @@ use App\Http\Controllers\Panel\Auth\AuthController;
 use App\Http\Controllers\Panel\Auth\ProfileController;
 use App\Http\Controllers\Panel\Country\CountryController;
 use App\Http\Controllers\Panel\Recipe\CategoryController;
+use App\Http\Controllers\Panel\Recipe\IngredientsController;
 use App\Http\Controllers\Panel\Recipe\TagController;
 use App\Http\Controllers\Panel\Recipe\UnitController;
 use App\Http\Controllers\Panel\User\PermissionController;
@@ -50,6 +51,10 @@ Route::group(['prefix' => 'v1'], function () {
             // Unit ----------------------------------------------
             Route::get('/unit/list', [UnitController::class, 'list']);
             Route::apiResource('unit', UnitController::class);
+
+            // Ingredient ----------------------------------------------
+            Route::get('/ingredient/list', [IngredientsController::class, 'list']);
+            Route::apiResource('ingredient', IngredientsController::class);
         });
     });
 });

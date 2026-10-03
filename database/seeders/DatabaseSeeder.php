@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
         $this->call(CountrySeeder::class);
         $this->call(CategorySeeder::class);
         $this->call(TagSeeder::class);
+        $this->call(IngredientSeeder::class);
 
         $user = User::factory()->create([
             'full_name' => 'Saeed',
