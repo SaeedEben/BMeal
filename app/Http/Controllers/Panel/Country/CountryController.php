@@ -26,7 +26,7 @@ class CountryController extends Controller
         $countries = Country::query()->paginate($perPage)
             ->withQueryString();
 
-        return $this->collection(CountryIndexResource::collection($$countries), __('responses.countries.index'));
+        return $this->collection(CountryIndexResource::collection($countries), __('responses.countries.index'));
     }
 
     /**
@@ -35,8 +35,9 @@ class CountryController extends Controller
     public function store(CountryStoreRequest $request)
     {
         $validated = $request->only([
-            'email', 'full_name',
-            'role_id'
+            'name', 'code',
+            'slug', 'description',
+            'status', 'flag_id'
         ]);
 
         try {
@@ -44,6 +45,8 @@ class CountryController extends Controller
             $country = new Country();
             $country->fill($validated);
             $country->save();
+
+            $country->flag()->associate($validated['flag_id'] ?? null);
 
             return $this->success($country, __('responses.countries.store'));
 
@@ -72,13 +75,15 @@ class CountryController extends Controller
     public function update(Country $country, CountryUpdateRequest $request)
     {
         $validated = $request->only([
-            'email', 'full_name',
-            'role_id'
+            'name', 'code',
+            'slug', 'description',
+            'status', 'flag_id'
         ]);
-
+        
         try {
 
             $country->fill($validated);
+            $country->status = $validated['status'] ?? $country->status;
             $country->update();
 
             return $this->success($country, __('responses.countries.update'));

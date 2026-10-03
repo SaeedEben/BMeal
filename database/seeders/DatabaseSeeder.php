@@ -20,17 +20,18 @@ class DatabaseSeeder extends Seeder
         // User::factory()->create();
 
         $this->call(UnitSeeder::class);
+        $this->call(CountrySeeder::class);
 
         $user = User::factory()->create([
-            'full_name' => 'Saeed',
-            'email' => 'saeed@gmail.com',
+            'full_name'         => 'Saeed',
+            'email'             => 'saeed@gmail.com',
             'email_verified_at' => now(),
-            'password' => 'password',
-            'remember_token' => Str::random(10),
-            'status' => 'active',
-            'last_active' => now(),
-            'created_at' => now(),
-            'updated_at' => now(),
+            'password'          => 'password',
+            'remember_token'    => Str::random(10),
+            'status'            => 'active',
+            'last_active'       => now(),
+            'created_at'        => now(),
+            'updated_at'        => now(),
         ]);
 
         Artisan::call('app:permissions');

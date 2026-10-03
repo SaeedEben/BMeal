@@ -31,4 +31,12 @@ return [
     'permissions' => [
         'index'           => 'Permissions list',
     ],
+
+    'countries' => [
+        'index'           => 'Countries list',
+        'show'            => 'Country data',
+        'store'           => 'Country created successfully.',
+        'update'          => 'Country updated successfully.',
+        'destroy'         => 'Country deleted successfully.',
+    ]
 ];

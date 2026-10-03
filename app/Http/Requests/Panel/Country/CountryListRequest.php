@@ -4,6 +4,7 @@ namespace App\Http\Requests\Panel\Country;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Country\Country;
 
 class CountryListRequest extends FormRequest
 {
@@ -12,7 +13,7 @@ class CountryListRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user()->can('PanelList', Country::class);
     }
 
     /**

@@ -32,5 +32,16 @@ return [
             ],
 
         ],
+
+        'country' => [
+            'country' => [
+                'index',
+                'store',
+                'show',
+                'update',
+                'destroy',
+                'list',
+            ]
+        ]
     ]
 ];

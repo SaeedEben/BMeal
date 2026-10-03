@@ -4,7 +4,7 @@ namespace App\Models\Country;
 
 use App\Enum\Common\StatusEnum;
 use Carbon\Carbon;
-use Database\Factories\CountryFactory;
+use Database\Factories\Country\CountryFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
