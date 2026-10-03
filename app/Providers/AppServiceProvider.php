@@ -2,8 +2,9 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\ServiceProvider;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -19,6 +20,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Gate::guessPolicyNamesUsing(fn(string $modelClass) => 'App\\Policies\\' . class_basename($modelClass) . 'Policy');
+        Gate::guessPolicyNamesUsing(static function (string $modelClass): string {
+            return str_replace('App\\Models\\', 'App\\Policies\\', $modelClass).'Policy';
+        });
     }
 }
