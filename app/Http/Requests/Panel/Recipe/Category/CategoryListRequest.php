@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Panel\Recipe\Category;
 
+use App\Models\Recipe\Category;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,7 +13,7 @@ class CategoryListRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user()->can('PanelList', Category::class);
     }
 
     /**

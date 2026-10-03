@@ -41,7 +41,50 @@ return [
                 'update',
                 'destroy',
                 'list',
-            ]
-        ]
-    ]
+            ],
+        ],
+
+        'recipe' => [
+            'category' => [
+                'index',
+                'store',
+                'show',
+                'update',
+                'destroy',
+                'list',
+            ],
+            'tag' => [
+                'index',
+                'store',
+                'show',
+                'update',
+                'destroy',
+                'list',
+            ],
+            'unit' => [
+                'index',
+                'store',
+                'show',
+                'update',
+                'destroy',
+                'list',
+            ],
+            'recipe' => [
+                'index',
+                'store',
+                'show',
+                'update',
+                'destroy',
+                'list',
+            ],
+            'ingredient' => [
+                'index',
+                'store',
+                'show',
+                'update',
+                'destroy',
+                'list',
+            ],
+        ],
+    ],
 ];

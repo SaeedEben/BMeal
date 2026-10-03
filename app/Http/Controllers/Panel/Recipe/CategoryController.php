@@ -3,20 +3,20 @@
 namespace App\Http\Controllers\Panel\Recipe;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Panel\Recipe\Category\CategoryIndexRequest;
+use App\Http\Requests\Panel\Recipe\Category\CategoryListRequest;
+use App\Http\Requests\Panel\Recipe\Category\CategoryStoreRequest;
+use App\Http\Requests\Panel\Recipe\Category\CategoryUpdateRequest;
+use App\Http\Resources\Panel\Recipe\Category\CategoryIndexResource;
+use App\Http\Resources\Panel\Recipe\Category\CategoryListResource;
+use App\Http\Resources\Panel\Recipe\Category\CategoryShowResource;
 use App\Models\Recipe\Category;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
-use App\Http\Requests\Panel\Recipe\Category\CategoryIndexRequest;
-use App\Http\Requests\Panel\Recipe\Category\CategoryStoreRequest;
-use App\Http\Requests\Panel\Recipe\Category\CategoryUpdateRequest;
-use App\Http\Requests\Panel\Recipe\Category\CategoryListRequest;
-use App\Http\Resources\Panel\Recipe\Category\CategoryListResource;
-use App\Http\Resources\Panel\Recipe\Category\CategoryShowResource;
-use App\Http\Resources\Panel\Recipe\Category\CategoryIndexResource;
 
 class CategoryController extends Controller
 {
-     /**
+    /**
      * Display a listing of the categories.
      */
     public function index(CategoryIndexRequest $request)
@@ -26,7 +26,7 @@ class CategoryController extends Controller
         $categories = Category::query()->paginate($perPage)
             ->withQueryString();
 
-        return $this->collection(CategoryIndexResource::collection($$categories), __('responses.categories.index'));
+        return $this->collection(CategoryIndexResource::collection($categories), __('responses.categories.index'));
     }
 
     /**
@@ -35,13 +35,13 @@ class CategoryController extends Controller
     public function store(CategoryStoreRequest $request)
     {
         $validated = $request->only([
-            'email', 'full_name',
-            'role_id'
+            'name', 'slug',
+            'status', 'description'
         ]);
 
         try {
 
-            $category = new Category();
+            $category = new Category;
             $category->fill($validated);
             $category->save();
 
@@ -72,8 +72,8 @@ class CategoryController extends Controller
     public function update(Category $category, CategoryUpdateRequest $request)
     {
         $validated = $request->only([
-            'email', 'full_name',
-            'role_id'
+            'name', 'slug',
+            'status', 'description'
         ]);
 
         try {

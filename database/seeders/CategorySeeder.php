@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Recipe\Category;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class CategorySeeder extends Seeder
 {
@@ -11,6 +13,20 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        $categories = [
+            'Vegetarian',
+            'Vegan',
+            'Healthy',
+            'High Protein',
+            'Low Carb',
+            'Gluten Free',
+        ];
+
+        foreach ($categories as $name) {
+            Category::query()->firstOrCreate(
+                ['slug' => Str::slug($name)],
+                ['name' => $name],
+            );
+        }
     }
 }
