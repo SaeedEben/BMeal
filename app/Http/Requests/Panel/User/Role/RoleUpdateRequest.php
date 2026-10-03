@@ -2,9 +2,14 @@
 
 namespace App\Http\Requests\Panel\User\Role;
 
+use App\Models\User\Role;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
+/**
+ * @property Role $role
+ */
 class RoleUpdateRequest extends FormRequest
 {
     /**
@@ -12,7 +17,7 @@ class RoleUpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user()->can('PanelUpdate', $this->role);
     }
 
     /**
@@ -23,7 +28,12 @@ class RoleUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('roles', 'name')->ignore($this->route('role')),
+            ],
         ];
     }
 }

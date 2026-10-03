@@ -34,12 +34,6 @@ class RoleController extends Controller
             });
         }
 
-        if ($request->has('role') && $request->role != null) {
-            $roles->whereHas('roles', function ($query) use ($request) {
-                $query->where('uuid', $request->string('role'));
-            });
-        }
-
         $roles = $roles->paginate($perPage)
             ->withQueryString();
 
@@ -52,20 +46,18 @@ class RoleController extends Controller
     public function store(RoleStoreRequest $request): JsonResponse
     {
         $validated = $request->only([
-            'email', 'full_name',
-            'password', 'role_id'
+            'name',
         ]);
 
         try {
-            $role = Role::query()->where('uuid', $request->role_id)->first();
 
-            $user = new Role();
-            $user->fill($validated);
-            $user->save();
+            $role = new Role();
+            $role->fill($validated);
+            $role->guard_name = 'web';
+            $role->save();
 
-            $user->assignRole($role);
+            return $this->success($role, __('responses.roles.store'));
 
-            return $this->success($user, __('responses.roles.store'));
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());
 
@@ -82,7 +74,6 @@ class RoleController extends Controller
             abort(403, __('responses.errors.unauthorized'));
         }
 
-        $role->load('roles');
         return $this->resource(new RoleShowResource($role), __('responses.roles.show'), 200);
     }
 
@@ -92,18 +83,16 @@ class RoleController extends Controller
     public function update(RoleUpdateRequest $request, Role $role): JsonResponse
     {
         $validated = $request->only([
-            'email', 'full_name',
-            'role_id'
+            'name',
         ]);
 
         try {
-            $role = Role::query()->where('uuid', $request->role_id)->firstOrFail();
 
             $role->fill($validated);
-            $role->assignRole($role);
             $role->save();
 
             return $this->success($role, __('responses.roles.update'));
+
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());
 

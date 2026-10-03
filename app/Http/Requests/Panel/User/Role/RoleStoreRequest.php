@@ -4,6 +4,7 @@ namespace App\Http\Requests\Panel\User\Role;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\User\Role;
 
 class RoleStoreRequest extends FormRequest
 {
@@ -12,7 +13,7 @@ class RoleStoreRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user()->can('PanelStore', Role::class);
     }
 
     /**
@@ -23,7 +24,7 @@ class RoleStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => 'required|string|max:100|unique:roles,name',
         ];
     }
 }

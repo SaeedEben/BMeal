@@ -21,4 +21,11 @@ return [
         'destroy'         => 'User deleted successfully.',
         'change_password' => 'User password changed successfully.',
     ],
+    'roles' => [
+        'index'           => 'Roles list',
+        'show'            => 'Role data',
+        'store'           => 'Role created successfully.',
+        'update'          => 'Role updated successfully.',
+        'destroy'         => 'Role deleted successfully.',
+    ],
 ];
