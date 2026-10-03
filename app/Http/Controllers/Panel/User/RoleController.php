@@ -121,6 +121,6 @@ class RoleController extends Controller
     {
         $roles = Role::query()->get();
 
-        return $this->collection(RoleListResource::collection($roles), __('responses.roles.list'));
+        return $this->collection(RoleListResource::collection($roles), __('responses.roles.index'));
     }
 }

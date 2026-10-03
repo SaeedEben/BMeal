@@ -142,7 +142,7 @@ class UserController extends Controller
 
         $users = $users->get();
 
-        return $this->collection(UserListResource::collection($users), __('responses.users.list'));
+        return $this->collection(UserListResource::collection($users), __('responses.users.index'));
     }
 
     public function changePassword(UserChangePasswordRequest $request, User $user): JsonResponse

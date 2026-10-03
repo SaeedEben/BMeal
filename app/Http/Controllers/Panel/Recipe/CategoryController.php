@@ -11,6 +11,7 @@ use App\Http\Resources\Panel\Recipe\Category\CategoryIndexResource;
 use App\Http\Resources\Panel\Recipe\Category\CategoryListResource;
 use App\Http\Resources\Panel\Recipe\Category\CategoryShowResource;
 use App\Models\Recipe\Category;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 
@@ -19,11 +20,18 @@ class CategoryController extends Controller
     /**
      * Display a listing of the categories.
      */
-    public function index(CategoryIndexRequest $request)
+    public function index(CategoryIndexRequest $request): JsonResponse
     {
         $perPage = $request->integer('per_page', 10);
 
-        $categories = Category::query()->paginate($perPage)
+        $categories = Category::query();
+        if ($request->has('search')) {
+            $search = '%'.$request->string('search')->trim().'%';
+            $categories->where(function ($query) use ($search) {
+                $query->where('name', 'like', $search);
+            });
+        }
+        $categories = $categories->paginate($perPage)
             ->withQueryString();
 
         return $this->collection(CategoryIndexResource::collection($categories), __('responses.categories.index'));
@@ -36,7 +44,7 @@ class CategoryController extends Controller
     {
         $validated = $request->only([
             'name', 'slug',
-            'status', 'description'
+            'status', 'description',
         ]);
 
         try {
@@ -73,7 +81,7 @@ class CategoryController extends Controller
     {
         $validated = $request->only([
             'name', 'slug',
-            'status', 'description'
+            'status', 'description',
         ]);
 
         try {
@@ -111,6 +119,6 @@ class CategoryController extends Controller
     {
         $categories = Category::query()->get();
 
-        return $this->collection(CategoryListResource::collection($categories), __('responses.categories.list'));
+        return $this->collection(CategoryListResource::collection($categories), __('responses.categories.index'));
     }
 }

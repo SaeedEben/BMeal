@@ -41,12 +41,21 @@ return [
         'destroy' => 'Country deleted successfully.',
     ],
 
-    // {Recipe} ----------------------------------------------
+    // {Category} ----------------------------------------------
     'categories' => [
         'index' => 'Categories list',
         'show' => 'Category data',
         'store' => 'Category created successfully.',
         'update' => 'Category updated successfully.',
         'destroy' => 'Category deleted successfully.',
+    ],
+
+    // {Tag} ----------------------------------------------
+    'tags' => [
+        'index' => 'Tags list',
+        'show' => 'Tag data',
+        'store' => 'Tag created successfully.',
+        'update' => 'Tag updated successfully.',
+        'destroy' => 'Tag deleted successfully.',
     ],
 ];

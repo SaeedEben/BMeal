@@ -4,6 +4,9 @@ namespace App\Http\Requests\Panel\Recipe\Tag;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Recipe\Tag;
+use Illuminate\Validation\Rule;
+use App\Enum\Common\StatusEnum;
 
 class TagStoreRequest extends FormRequest
 {
@@ -12,7 +15,7 @@ class TagStoreRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user()->can('PanelStore', Tag::class);
     }
 
     /**
@@ -23,7 +26,14 @@ class TagStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name'        => 'required|string|max:150',
+            'slug'        => [
+                'required',
+                'string',
+                'max:150',
+                Rule::unique('tags' , 'slug'),
+            ],
+            'status'      => 'nullable|string|in:' . implode(',', StatusEnum::values()),
         ];
     }
 }

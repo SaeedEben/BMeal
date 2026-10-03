@@ -4,6 +4,7 @@ namespace App\Http\Requests\Panel\Recipe\Tag;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Recipe\Tag;
 
 class TagListRequest extends FormRequest
 {
@@ -12,7 +13,7 @@ class TagListRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user()->can('PanelList', Tag::class);
     }
 
     /**

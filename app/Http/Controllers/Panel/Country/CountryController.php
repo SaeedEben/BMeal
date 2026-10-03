@@ -116,6 +116,6 @@ class CountryController extends Controller
     {
         $countries = Country::query()->get();
 
-        return $this->collection(CountryListResource::collection($countries), __('responses.countries.list'));
+        return $this->collection(CountryListResource::collection($countries), __('responses.countries.index'));
     }
 }
