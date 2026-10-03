@@ -9,36 +9,36 @@ class PermissionPolicy
 {
     public function PanelIndex(User $user): bool
     {
-        return $user->can('panel.permission.index', Permission::class);
+        return $user->can('panel.user.permission.index', Permission::class);
     }
 
     public function PanelStore(User $user): bool
     {
-        return $user->can('panel.permission.store', Permission::class);
+        return $user->can('panel.user.permission.store', Permission::class);
     }
 
     public function PanelShow(User $user, Permission $model): bool
     {
-        return $user->can('panel.permission.show', $model);
+        return $user->can('panel.user.permission.show', $model);
     }
 
     public function PanelUpdate(User $user, Permission $model): bool
     {
-        return $user->can('panel.permission.update', $model);
+        return $user->can('panel.user.permission.update', $model);
     }
 
     public function PanelDelete(User $user, Permission $model): bool
     {
-        return $user->can('panel.permission.destroy', $model);
+        return $user->can('panel.user.permission.destroy', $model);
     }
 
     public function PanelList(User $user): bool
     {
-        return $user->can('panel.permission.list', Permission::class);
+        return $user->can('panel.user.permission.list', Permission::class);
     }
 
     public function PanelChangeStatus(User $user, Permission $model): bool
     {
-        return $user->can('panel.permission.change_status', $model);
+        return $user->can('panel.user.permission.change_status', $model);
     }
 }

@@ -9,36 +9,36 @@ class TagPolicy
 {
     public function PanelIndex(User $user): bool
     {
-        return $user->can('panel.tag.index', Tag::class);
+        return $user->can('panel.recipe.tag.index', Tag::class);
     }
 
     public function PanelStore(User $user): bool
     {
-        return $user->can('panel.tag.store', Tag::class);
+        return $user->can('panel.recipe.tag.store', Tag::class);
     }
 
     public function PanelShow(User $user, Tag $model): bool
     {
-        return $user->can('panel.tag.show', $model);
+        return $user->can('panel.recipe.tag.show', $model);
     }
 
     public function PanelUpdate(User $user, Tag $model): bool
     {
-        return $user->can('panel.tag.update', $model);
+        return $user->can('panel.recipe.tag.update', $model);
     }
 
     public function PanelDelete(User $user, Tag $model): bool
     {
-        return $user->can('panel.tag.destroy', $model);
+        return $user->can('panel.recipe.tag.destroy', $model);
     }
 
     public function PanelList(User $user): bool
     {
-        return $user->can('panel.tag.list', Tag::class);
+        return $user->can('panel.recipe.tag.list', Tag::class);
     }
 
     public function PanelChangeStatus(User $user, Tag $model): bool
     {
-        return $user->can('panel.tag.change_status', $model);
+        return $user->can('panel.recipe.tag.change_status', $model);
     }
 }

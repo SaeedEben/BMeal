@@ -3,12 +3,34 @@
 return [
     'panel' => [
         'user' => [
-            'index',
-            'store',
-            'show',
-            'update',
-            'destroy',
-            'list',
+            'user' => [
+                'index',
+                'store',
+                'show',
+                'update',
+                'destroy',
+                'list',
+            ],
+            'user_favorite' => [
+                'index',
+                'store',
+                'show',
+                'update',
+                'destroy',
+                'list',
+            ],
+            'role' => [
+                'index',
+                'store',
+                'show',
+                'update',
+                'destroy',
+                'list',
+            ],
+            'permission' => [
+                'index',
+            ],
+
         ],
     ]
 ];

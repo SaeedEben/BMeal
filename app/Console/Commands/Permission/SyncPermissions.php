@@ -23,15 +23,17 @@ class SyncPermissions extends Command
         $allPermissions = [];
         $key            = 0;
         foreach ($file as $panel => $environment) {
-            foreach ($environment as $scope => $permissions) {
-                foreach ($permissions as $permission) {
-//                    $allPermissions[$key]['uuid']       = (string)Str::uuid();
-                    $allPermissions[$key]['name']       = "$panel.$scope.$permission";
-                    $allPermissions[$key]['guard_name'] = "web";
-//                    $allPermissions[$key]['created_at'] = \Illuminate\Support\now();
-//                    $allPermissions[$key]['updated_at'] = \Illuminate\Support\now();
-                    Permission::FirstOrCreate($allPermissions[$key]);
-                    $key++;
+            foreach ($environment as $name => $namespace) {
+                foreach ($namespace as $scope => $permissions) {
+                    foreach ($permissions as $permission) {
+    //                    $allPermissions[$key]['uuid']       = (string)Str::uuid();
+                        $allPermissions[$key]['name']       = "$panel.$name.$scope.$permission";
+                        $allPermissions[$key]['guard_name'] = "web";
+    //                    $allPermissions[$key]['created_at'] = \Illuminate\Support\now();
+    //                    $allPermissions[$key]['updated_at'] = \Illuminate\Support\now();
+                        Permission::FirstOrCreate($allPermissions[$key]);
+                        $key++;
+                    }
                 }
             }
         }

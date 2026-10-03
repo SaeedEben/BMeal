@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Panel\User\Role;
 
+use App\Models\User\Role;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,7 +13,7 @@ class RoleIndexRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user()->can('PanelIndex', Role::class);
     }
 
     /**
