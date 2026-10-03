@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Panel\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Panel\Auth\ProfileRequest;
 use App\Http\Resources\Panel\Permission\PermissionListResource;
-use App\Http\Resources\Panel\User\UserShowResource;
-use App\Models\User;
+use App\Http\Resources\Panel\User\User\UserShowResource;
+use App\Models\User\User;
 
 class ProfileController extends Controller
 {
