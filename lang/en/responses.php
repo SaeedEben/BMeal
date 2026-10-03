@@ -28,4 +28,7 @@ return [
         'update'          => 'Role updated successfully.',
         'destroy'         => 'Role deleted successfully.',
     ],
+    'permissions' => [
+        'index'           => 'Permissions list',
+    ],
 ];
