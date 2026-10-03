@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('name', 50);
             $table->string('symbol', 20);
             $table->string('slug', 60)->unique();
-            $table->enum('type', ['weight', 'volume', 'count', 'length', 'temperature']);
+            $table->string('type');
 
             $table->decimal('conversion_factor', 12, 6)->nullable();
             $table->boolean('is_metric')->default(true);

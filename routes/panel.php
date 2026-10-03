@@ -5,6 +5,7 @@ use App\Http\Controllers\Panel\Auth\ProfileController;
 use App\Http\Controllers\Panel\Country\CountryController;
 use App\Http\Controllers\Panel\Recipe\CategoryController;
 use App\Http\Controllers\Panel\Recipe\TagController;
+use App\Http\Controllers\Panel\Recipe\UnitController;
 use App\Http\Controllers\Panel\User\PermissionController;
 use App\Http\Controllers\Panel\User\RoleController;
 use App\Http\Controllers\Panel\User\UserController;
@@ -45,6 +46,10 @@ Route::group(['prefix' => 'v1'], function () {
             // Tag ----------------------------------------------
             Route::get('/tag/list', [TagController::class, 'list']);
             Route::apiResource('tag', TagController::class);
+
+            // Unit ----------------------------------------------
+            Route::get('/unit/list', [UnitController::class, 'list']);
+            Route::apiResource('unit', UnitController::class);
         });
     });
 });

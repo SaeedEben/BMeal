@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enum\Recipe\UnitTypeEnum;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -14,30 +15,30 @@ class UnitSeeder extends Seeder
     public function run(): void
     {
         $units = [
-            ['name' => 'Gram', 'symbol' => 'g', 'type' => 'weight', 'is_metric' => true],
-            ['name' => 'Kilogram', 'symbol' => 'kg', 'type' => 'weight', 'is_metric' => true],
-            ['name' => 'Milligram', 'symbol' => 'mg', 'type' => 'weight', 'is_metric' => true],
-            ['name' => 'Ounce', 'symbol' => 'oz', 'type' => 'weight', 'is_metric' => false],
-            ['name' => 'Pound', 'symbol' => 'lb', 'type' => 'weight', 'is_metric' => false],
-            ['name' => 'Milliliter', 'symbol' => 'ml', 'type' => 'volume', 'is_metric' => true],
-            ['name' => 'Liter', 'symbol' => 'l', 'type' => 'volume', 'is_metric' => true],
-            ['name' => 'Teaspoon', 'symbol' => 'tsp', 'type' => 'volume', 'is_metric' => false],
-            ['name' => 'Tablespoon', 'symbol' => 'tbsp', 'type' => 'volume', 'is_metric' => false],
-            ['name' => 'Cup', 'symbol' => 'cup', 'type' => 'volume', 'is_metric' => false],
-            ['name' => 'Fluid Ounce', 'symbol' => 'fl oz', 'type' => 'volume', 'is_metric' => false],
-            ['name' => 'Pint', 'symbol' => 'pt', 'type' => 'volume', 'is_metric' => false],
-            ['name' => 'Quart', 'symbol' => 'qt', 'type' => 'volume', 'is_metric' => false],
-            ['name' => 'Gallon', 'symbol' => 'gal', 'type' => 'volume', 'is_metric' => false],
-            ['name' => 'Piece', 'symbol' => 'pcs', 'type' => 'count', 'is_metric' => false],
-            ['name' => 'Clove', 'symbol' => 'clove', 'type' => 'count', 'is_metric' => false],
-            ['name' => 'Slice', 'symbol' => 'slice', 'type' => 'count', 'is_metric' => false],
-            ['name' => 'Can', 'symbol' => 'can', 'type' => 'count', 'is_metric' => false],
-            ['name' => 'Package', 'symbol' => 'pkg', 'type' => 'count', 'is_metric' => false],
-            ['name' => 'Bottle', 'symbol' => 'bottle', 'type' => 'count', 'is_metric' => false],
-            ['name' => 'Bunch', 'symbol' => 'bunch', 'type' => 'count', 'is_metric' => false],
-            ['name' => 'Head', 'symbol' => 'head', 'type' => 'count', 'is_metric' => false],
-            ['name' => 'Stick', 'symbol' => 'stick', 'type' => 'count', 'is_metric' => false],
-            ['name' => 'Fillet', 'symbol' => 'fillet', 'type' => 'count', 'is_metric' => false],
+            ['name' => 'Gram', 'symbol' => 'g', 'type' => UnitTypeEnum::WEIGHT, 'is_metric' => true],
+            ['name' => 'Kilogram', 'symbol' => 'kg', 'type' => UnitTypeEnum::WEIGHT, 'is_metric' => true],
+            ['name' => 'Milligram', 'symbol' => 'mg', 'type' => UnitTypeEnum::WEIGHT, 'is_metric' => true],
+            ['name' => 'Ounce', 'symbol' => 'oz', 'type' => UnitTypeEnum::WEIGHT, 'is_metric' => false],
+            ['name' => 'Pound', 'symbol' => 'lb', 'type' => UnitTypeEnum::WEIGHT, 'is_metric' => false],
+            ['name' => 'Milliliter', 'symbol' => 'ml', 'type' => UnitTypeEnum::VOLUME, 'is_metric' => true],
+            ['name' => 'Liter', 'symbol' => 'l', 'type' => UnitTypeEnum::VOLUME, 'is_metric' => true],
+            ['name' => 'Teaspoon', 'symbol' => 'tsp', 'type' => UnitTypeEnum::VOLUME, 'is_metric' => false],
+            ['name' => 'Tablespoon', 'symbol' => 'tbsp', 'type' => UnitTypeEnum::VOLUME, 'is_metric' => false],
+            ['name' => 'Cup', 'symbol' => 'cup', 'type' => UnitTypeEnum::VOLUME, 'is_metric' => false],
+            ['name' => 'Fluid Ounce', 'symbol' => 'fl oz', 'type' => UnitTypeEnum::VOLUME, 'is_metric' => false],
+            ['name' => 'Pint', 'symbol' => 'pt', 'type' => UnitTypeEnum::VOLUME, 'is_metric' => false],
+            ['name' => 'Quart', 'symbol' => 'qt', 'type' => UnitTypeEnum::VOLUME, 'is_metric' => false],
+            ['name' => 'Gallon', 'symbol' => 'gal', 'type' => UnitTypeEnum::VOLUME, 'is_metric' => false],
+            ['name' => 'Piece', 'symbol' => 'pcs', 'type' => UnitTypeEnum::COUNT, 'is_metric' => false],
+            ['name' => 'Clove', 'symbol' => 'clove', 'type' => UnitTypeEnum::COUNT, 'is_metric' => false],
+            ['name' => 'Slice', 'symbol' => 'slice', 'type' => UnitTypeEnum::COUNT, 'is_metric' => false],
+            ['name' => 'Can', 'symbol' => 'can', 'type' => UnitTypeEnum::COUNT, 'is_metric' => false],
+            ['name' => 'Package', 'symbol' => 'pkg', 'type' => UnitTypeEnum::COUNT, 'is_metric' => false],
+            ['name' => 'Bottle', 'symbol' => 'bottle', 'type' => UnitTypeEnum::COUNT, 'is_metric' => false],
+            ['name' => 'Bunch', 'symbol' => 'bunch', 'type' => UnitTypeEnum::COUNT, 'is_metric' => false],
+            ['name' => 'Head', 'symbol' => 'head', 'type' => UnitTypeEnum::COUNT, 'is_metric' => false],
+            ['name' => 'Stick', 'symbol' => 'stick', 'type' => UnitTypeEnum::COUNT, 'is_metric' => false],
+            ['name' => 'Fillet', 'symbol' => 'fillet', 'type' => UnitTypeEnum::COUNT, 'is_metric' => false],
         ];
 
         $now = now();

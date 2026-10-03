@@ -14,6 +14,9 @@ class UnitListResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'vlaue' => $this->id,
+            'label' => $this->name,
+        ];
     }
 }
