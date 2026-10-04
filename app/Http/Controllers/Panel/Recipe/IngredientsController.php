@@ -12,6 +12,7 @@ use App\Http\Resources\Panel\Recipe\Ingredients\IngredientsListResource;
 use App\Http\Resources\Panel\Recipe\Ingredients\IngredientsShowResource;
 use App\Models\Recipe\Ingredient;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 
@@ -49,10 +50,13 @@ class IngredientsController extends Controller
         ]);
 
         try {
+            $Ingredients = DB::transaction(function () use ($validated): Ingredient {
+                $ingredient = new Ingredient;
+                $ingredient->fill($validated);
+                $ingredient->save();
 
-            $Ingredients = new Ingredient;
-            $Ingredients->fill($validated);
-            $Ingredients->save();
+                return $ingredient;
+            });
 
             return $this->success($Ingredients, __('responses.ingredients.store'));
 
@@ -85,9 +89,10 @@ class IngredientsController extends Controller
         ]);
 
         try {
-
-            $ingredient->fill($validated);
-            $ingredient->save();
+            DB::transaction(function () use ($ingredient, $validated): void {
+                $ingredient->fill($validated);
+                $ingredient->save();
+            });
 
             return $this->success($ingredient, __('responses.ingredients.update'));
 

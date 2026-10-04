@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Panel\Recipe\Recipe;
 
+use App\Models\Recipe\Recipe;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,7 +13,7 @@ class RecipeIndexRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user()->can('PanelIndex', Recipe::class);
     }
 
     /**

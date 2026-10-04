@@ -26,7 +26,7 @@ return new class extends Migration
             $table->unsignedSmallInteger('cook_time_minutes')->nullable();
             $table->unsignedSmallInteger('servings')->nullable();
 
-            $table->enum('difficulty', ['easy', 'medium', 'hard'])->nullable()->default('easy');
+            $table->string('difficulty')->default('easy');
             $table->decimal('calories_per_serving', 8, 2)->nullable();
 
             $table->string('status')->default('active');

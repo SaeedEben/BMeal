@@ -12,6 +12,7 @@ use App\Http\Resources\Panel\Recipe\Tag\TagListResource;
 use App\Http\Resources\Panel\Recipe\Tag\TagShowResource;
 use App\Models\Recipe\Tag;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 
@@ -45,14 +46,17 @@ class TagController extends Controller
     public function store(TagStoreRequest $request): JsonResponse
     {
         $validated = $request->only([
-            'name', 'slug', 'status'
+            'name', 'slug', 'status',
         ]);
 
         try {
+            $Tag = DB::transaction(function () use ($validated): Tag {
+                $tag = new Tag;
+                $tag->fill($validated);
+                $tag->save();
 
-            $Tag = new Tag;
-            $Tag->fill($validated);
-            $Tag->save();
+                return $tag;
+            });
 
             return $this->success($Tag, __('responses.tags.store'));
         } catch (\Exception $exception) {
@@ -80,13 +84,14 @@ class TagController extends Controller
     public function update(TagUpdateRequest $request, Tag $Tag): JsonResponse
     {
         $validated = $request->only([
-            'name', 'slug', 'status'
+            'name', 'slug', 'status',
         ]);
 
         try {
-
-            $Tag->fill($validated);
-            $Tag->save();
+            DB::transaction(function () use ($Tag, $validated): void {
+                $Tag->fill($validated);
+                $Tag->save();
+            });
 
             return $this->success($Tag, __('responses.tags.update'));
         } catch (\Exception $exception) {

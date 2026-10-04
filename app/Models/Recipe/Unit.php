@@ -3,8 +3,9 @@
 namespace App\Models\Recipe;
 
 use App\Enum\Common\StatusEnum;
+use App\Enum\Recipe\UnitTypeEnum;
 use Carbon\Carbon;
-use Database\Factories\UnitFactory;
+use Database\Factories\Recipe\UnitFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -43,6 +44,7 @@ class Unit extends Model
             'conversion_factor' => 'decimal:6',
             'is_metric' => 'boolean',
             'status' => StatusEnum::class,
+            'type' => UnitTypeEnum::class,
         ];
     }
 }

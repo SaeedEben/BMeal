@@ -3,21 +3,22 @@
 namespace App\Http\Controllers\Panel\User;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\JsonResponse;
 use App\Http\Requests\Panel\User\Role\RoleIndexRequest;
+use App\Http\Requests\Panel\User\Role\RoleListRequest;
 use App\Http\Requests\Panel\User\Role\RoleStoreRequest;
 use App\Http\Requests\Panel\User\Role\RoleUpdateRequest;
-use App\Http\Requests\Panel\User\Role\RoleListRequest;
 use App\Http\Resources\Panel\User\Role\RoleIndexResource;
-use App\Http\Resources\Panel\User\Role\RoleShowResource;
 use App\Http\Resources\Panel\User\Role\RoleListResource;
+use App\Http\Resources\Panel\User\Role\RoleShowResource;
 use App\Models\User\Role;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 
 class RoleController extends Controller
 {
-     /**
+    /**
      * Display a listing of the resource.
      */
     public function index(RoleIndexRequest $request): JsonResponse
@@ -27,7 +28,7 @@ class RoleController extends Controller
         $roles = Role::query();
 
         if ($request->has('search')) {
-            $search = '%' . $request->string('search')->trim() . '%';
+            $search = '%'.$request->string('search')->trim().'%';
             $roles->where(function ($query) use ($search) {
                 $query->where('full_name', 'like', $search)
                     ->orWhere('email', 'like', $search);
@@ -50,11 +51,14 @@ class RoleController extends Controller
         ]);
 
         try {
+            $role = DB::transaction(function () use ($validated): Role {
+                $role = new Role;
+                $role->fill($validated);
+                $role->guard_name = 'web';
+                $role->save();
 
-            $role = new Role();
-            $role->fill($validated);
-            $role->guard_name = 'web';
-            $role->save();
+                return $role;
+            });
 
             return $this->success($role, __('responses.roles.store'));
 
@@ -87,9 +91,10 @@ class RoleController extends Controller
         ]);
 
         try {
-
-            $role->fill($validated);
-            $role->save();
+            DB::transaction(function () use ($role, $validated): void {
+                $role->fill($validated);
+                $role->save();
+            });
 
             return $this->success($role, __('responses.roles.update'));
 

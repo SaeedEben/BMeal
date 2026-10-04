@@ -3,7 +3,7 @@
 namespace App\Models\Recipe;
 
 use App\Enum\Common\StatusEnum;
-use Database\Factories\RecipeTagFactory;
+use Database\Factories\Recipe\RecipeTagFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

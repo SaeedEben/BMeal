@@ -12,12 +12,13 @@ use App\Http\Resources\Panel\Recipe\Unit\UnitListResource;
 use App\Http\Resources\Panel\Recipe\Unit\UnitShowResource;
 use App\Models\Recipe\Unit;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 
 class UnitController extends Controller
 {
-       /**
+    /**
      * Display a listing of the resource.
      */
     public function index(UnitIndexRequest $request): JsonResponse
@@ -39,21 +40,24 @@ class UnitController extends Controller
         return $this->collection(UnitIndexResource::collection($units), __('responses.units.index'));
     }
 
-      /**
+    /**
      * Store a newly created resource in storage.
      */
     public function store(UnitStoreRequest $request): JsonResponse
     {
         $validated = $request->only([
-            "name","symbol","slug","type",
-            "conversion_factor","is_metric","status"
+            'name', 'symbol', 'slug', 'type',
+            'conversion_factor', 'is_metric', 'status',
         ]);
 
         try {
+            $Unit = DB::transaction(function () use ($validated): Unit {
+                $unit = new Unit;
+                $unit->fill($validated);
+                $unit->save();
 
-            $Unit = new Unit;
-            $Unit->fill($validated);
-            $Unit->save();
+                return $unit;
+            });
 
             return $this->success($Unit, __('responses.units.store'));
 
@@ -64,7 +68,7 @@ class UnitController extends Controller
         }
     }
 
-      /**
+    /**
      * Display the specified resource.
      */
     public function show(Unit $Unit): JsonResponse
@@ -76,20 +80,21 @@ class UnitController extends Controller
         return $this->resource(new UnitShowResource($Unit), __('responses.units.show'), 200);
     }
 
-      /**
+    /**
      * Update the specified resource in storage.
      */
     public function update(UnitUpdateRequest $request, Unit $Unit): JsonResponse
     {
         $validated = $request->only([
-            "name","symbol","slug","type",
-            "conversion_factor","is_metric","status"
+            'name', 'symbol', 'slug', 'type',
+            'conversion_factor', 'is_metric', 'status',
         ]);
 
         try {
-
-            $Unit->fill($validated);
-            $Unit->save();
+            DB::transaction(function () use ($Unit, $validated): void {
+                $Unit->fill($validated);
+                $Unit->save();
+            });
 
             return $this->success($Unit, __('responses.units.update'));
         } catch (\Exception $exception) {
@@ -99,7 +104,7 @@ class UnitController extends Controller
         }
     }
 
-      /**
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(Unit $Unit): JsonResponse
@@ -113,7 +118,7 @@ class UnitController extends Controller
         return $this->success(message: __('responses.units.destroy'));
     }
 
-      /**
+    /**
      * List the resource.
      */
     public function list(UnitListRequest $request): JsonResponse

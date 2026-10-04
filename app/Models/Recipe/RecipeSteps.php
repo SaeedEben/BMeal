@@ -4,7 +4,7 @@ namespace App\Models\Recipe;
 
 use App\Enum\Common\StatusEnum;
 use Carbon\Carbon;
-use Database\Factories\RecipeStepsFactory;
+use Database\Factories\Recipe\RecipeStepsFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

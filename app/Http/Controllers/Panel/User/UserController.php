@@ -11,10 +11,11 @@ use App\Http\Requests\Panel\User\User\UserUpdateRequest;
 use App\Http\Resources\Panel\User\User\UserIndexResource;
 use App\Http\Resources\Panel\User\User\UserListResource;
 use App\Http\Resources\Panel\User\User\UserShowResource;
-use Illuminate\Support\Facades\Gate;
-use App\Models\User\User;
 use App\Models\User\Role;
+use App\Models\User\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
@@ -29,7 +30,7 @@ class UserController extends Controller
         $users = User::query();
 
         if ($request->has('search')) {
-            $search = '%' . $request->string('search')->trim() . '%';
+            $search = '%'.$request->string('search')->trim().'%';
             $users->where(function ($query) use ($search) {
                 $query->where('full_name', 'like', $search)
                     ->orWhere('email', 'like', $search);
@@ -55,17 +56,21 @@ class UserController extends Controller
     {
         $validated = $request->only([
             'email', 'full_name',
-            'password', 'role_id'
+            'password', 'role_id',
         ]);
 
         try {
-            $role = Role::query()->where('uuid', $request->role_id)->first();
+            $user = DB::transaction(function () use ($request, $validated): User {
+                $role = Role::query()->where('uuid', $request->role_id)->first();
 
-            $user = new User();
-            $user->fill($validated);
-            $user->save();
+                $user = new User;
+                $user->fill($validated);
+                $user->save();
 
-            $user->assignRole($role);
+                $user->assignRole($role);
+
+                return $user;
+            });
 
             return $this->success($user, __('responses.users.store'));
         } catch (\Exception $exception) {
@@ -85,6 +90,7 @@ class UserController extends Controller
         }
 
         $user->load('roles');
+
         return $this->resource(new UserShowResource($user), __('responses.users.show'), 200);
     }
 
@@ -95,15 +101,17 @@ class UserController extends Controller
     {
         $validated = $request->only([
             'email', 'full_name',
-            'role_id'
+            'role_id',
         ]);
 
         try {
-            $role = Role::query()->where('uuid', $request->role_id)->firstOrFail();
+            DB::transaction(function () use ($request, $user, $validated): void {
+                $roleToAssign = Role::query()->where('uuid', $request->role_id)->firstOrFail();
 
-            $user->fill($validated);
-            $user->assignRole($role);
-            $user->save();
+                $user->fill($validated);
+                $user->assignRole($roleToAssign);
+                $user->save();
+            });
 
             return $this->success($user, __('responses.users.update'));
         } catch (\Exception $exception) {

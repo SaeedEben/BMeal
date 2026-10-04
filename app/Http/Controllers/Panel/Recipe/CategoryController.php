@@ -12,6 +12,7 @@ use App\Http\Resources\Panel\Recipe\Category\CategoryListResource;
 use App\Http\Resources\Panel\Recipe\Category\CategoryShowResource;
 use App\Models\Recipe\Category;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 
@@ -48,10 +49,13 @@ class CategoryController extends Controller
         ]);
 
         try {
+            $category = DB::transaction(function () use ($validated): Category {
+                $category = new Category;
+                $category->fill($validated);
+                $category->save();
 
-            $category = new Category;
-            $category->fill($validated);
-            $category->save();
+                return $category;
+            });
 
             return $this->success($category, __('responses.categories.store'));
 
@@ -85,9 +89,10 @@ class CategoryController extends Controller
         ]);
 
         try {
-
-            $category->fill($validated);
-            $category->update();
+            DB::transaction(function () use ($category, $validated): void {
+                $category->fill($validated);
+                $category->save();
+            });
 
             return $this->success($category, __('responses.categories.update'));
 

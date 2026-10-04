@@ -4,14 +4,15 @@ namespace App\Http\Controllers\Panel\Country;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Panel\Country\CountryIndexRequest;
+use App\Http\Requests\Panel\Country\CountryListRequest;
 use App\Http\Requests\Panel\Country\CountryStoreRequest;
 use App\Http\Requests\Panel\Country\CountryUpdateRequest;
-use App\Http\Requests\Panel\Country\CountryListRequest;
 use App\Http\Resources\Panel\Country\CountryIndexResource;
-use App\Http\Resources\Panel\Country\CountryShowResource;
 use App\Http\Resources\Panel\Country\CountryListResource;
-use Illuminate\Support\Facades\Gate;
+use App\Http\Resources\Panel\Country\CountryShowResource;
 use App\Models\Country\Country;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 
 class CountryController extends Controller
@@ -37,16 +38,18 @@ class CountryController extends Controller
         $validated = $request->only([
             'name', 'code',
             'slug', 'description',
-            'status', 'flag_id'
+            'status', 'flag_id',
         ]);
 
         try {
+            $country = DB::transaction(function () use ($validated): Country {
+                $country = new Country;
+                $country->fill($validated);
+                $country->flag()->associate($validated['flag_id'] ?? null);
+                $country->save();
 
-            $country = new Country();
-            $country->fill($validated);
-            $country->save();
-
-            $country->flag()->associate($validated['flag_id'] ?? null);
+                return $country;
+            });
 
             return $this->success($country, __('responses.countries.store'));
 
@@ -77,14 +80,15 @@ class CountryController extends Controller
         $validated = $request->only([
             'name', 'code',
             'slug', 'description',
-            'status', 'flag_id'
+            'status', 'flag_id',
         ]);
-        
-        try {
 
-            $country->fill($validated);
-            $country->status = $validated['status'] ?? $country->status;
-            $country->update();
+        try {
+            DB::transaction(function () use ($country, $validated): void {
+                $country->fill($validated);
+                $country->status = $validated['status'] ?? $country->status;
+                $country->update();
+            });
 
             return $this->success($country, __('responses.countries.update'));
 

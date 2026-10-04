@@ -4,7 +4,7 @@ namespace App\Models\Recipe;
 
 use App\Enum\Common\StatusEnum;
 use Carbon\Carbon;
-use Database\Factories\TagFactory;
+use Database\Factories\Recipe\TagFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
