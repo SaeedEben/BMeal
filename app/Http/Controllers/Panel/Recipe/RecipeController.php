@@ -126,11 +126,6 @@ class RecipeController extends Controller
     {
         $recipes = Recipe::query();
 
-        if ($request->has('role')) {
-            $recipes->whereHas('roles', function ($query) use ($request) {
-                $query->where('name', $request->role);
-            });
-        }
 
         $recipes = $recipes->get();
 
