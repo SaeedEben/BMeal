@@ -84,6 +84,8 @@ class RoleController extends Controller
             abort(403, __('responses.errors.unauthorized'));
         }
 
+        $role->with('permissions');
+
         return $this->resource(new RoleShowResource($role), __('responses.roles.show'), 200);
     }
 
