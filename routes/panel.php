@@ -11,12 +11,13 @@ use App\Http\Controllers\Panel\Recipe\UnitController;
 use App\Http\Controllers\Panel\User\PermissionController;
 use App\Http\Controllers\Panel\User\RoleController;
 use App\Http\Controllers\Panel\User\UserController;
+use App\Http\Middleware\EnsureUserIsNotCustomer;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'v1'], function () {
     Route::post('login', [AuthController::class, 'login']);
 
-    Route::group(['middleware' => ['auth:sanctum', 'role:admin']], function () {
+    Route::group(['middleware' => ['auth:sanctum', EnsureUserIsNotCustomer::class]], function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/profile', [ProfileController::class, 'profile']);
 
