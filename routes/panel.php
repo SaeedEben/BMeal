@@ -27,7 +27,7 @@ Route::group(['prefix' => 'v1'], function () {
             Route::apiResource('user', UserController::class);
 
             // Role ------------------------------------------------------------------------
-            Route::get('/roles/list', [RoleController::class, 'list']);
+            Route::get('/role/list', [RoleController::class, 'list']);
             Route::apiResource('role', RoleController::class);
 
             // Permission ------------------------------------------------------------------------
