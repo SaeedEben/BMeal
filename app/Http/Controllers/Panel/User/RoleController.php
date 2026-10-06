@@ -10,6 +10,7 @@ use App\Http\Requests\Panel\User\Role\RoleUpdateRequest;
 use App\Http\Resources\Panel\User\Role\RoleIndexResource;
 use App\Http\Resources\Panel\User\Role\RoleListResource;
 use App\Http\Resources\Panel\User\Role\RoleShowResource;
+use App\Models\User\Permission;
 use App\Models\User\Role;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -46,16 +47,21 @@ class RoleController extends Controller
      */
     public function store(RoleStoreRequest $request): JsonResponse
     {
-        $validated = $request->only([
-            'name',
-        ]);
+        $validated = $request->validated();
+        $permissionUuids = $validated['permissions'] ?? null;
+        unset($validated['permissions']);
 
         try {
-            $role = DB::transaction(function () use ($validated): Role {
+            $role = DB::transaction(function () use ($validated, $permissionUuids): Role {
                 $role = new Role;
                 $role->fill($validated);
                 $role->guard_name = 'web';
                 $role->save();
+
+                if ($permissionUuids !== null) {
+                    $permissions = Permission::query()->whereIn('uuid', $permissionUuids)->get();
+                    $role->syncPermissions($permissions);
+                }
 
                 return $role;
             });
@@ -86,14 +92,19 @@ class RoleController extends Controller
      */
     public function update(RoleUpdateRequest $request, Role $role): JsonResponse
     {
-        $validated = $request->only([
-            'name',
-        ]);
+        $validated = $request->validated();
+        $permissionUuids = $validated['permissions'] ?? null;
+        unset($validated['permissions']);
 
         try {
-            DB::transaction(function () use ($role, $validated): void {
+            DB::transaction(function () use ($role, $validated, $permissionUuids): void {
                 $role->fill($validated);
                 $role->save();
+
+                if ($permissionUuids !== null) {
+                    $permissions = Permission::query()->whereIn('uuid', $permissionUuids)->get();
+                    $role->syncPermissions($permissions);
+                }
             });
 
             return $this->success($role, __('responses.roles.update'));

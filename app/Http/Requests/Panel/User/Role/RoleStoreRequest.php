@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\Panel\User\Role;
 
+use App\Models\User\Role;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use App\Models\User\Role;
 
 class RoleStoreRequest extends FormRequest
 {
@@ -25,6 +25,8 @@ class RoleStoreRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:100|unique:roles,name',
+            'permissions' => ['required', 'array', 'list'],
+            'permissions.*' => ['required', 'uuid', 'exists:permissions,uuid'],
         ];
     }
 }
