@@ -24,6 +24,7 @@ class UserShowResource extends JsonResource
             'email'             => $this->email,
             'full_name'         => $this->full_name,
             'email_verified_at' => $this->email_verified_at,
+            'status'            => $this->status->label(),
             'last_active'       => $this->last_active,
             'created_at'        => $this->created_at,
             'updated_at'        => $this->updated_at,

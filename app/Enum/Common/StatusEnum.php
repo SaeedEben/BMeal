@@ -9,7 +9,7 @@ enum StatusEnum: string
 
     public function label(): string
     {
-        return __("enums.status.{$this->value}");
+        return __("enums/common.status.{$this->value}");
     }
 
     public static function values(): array
