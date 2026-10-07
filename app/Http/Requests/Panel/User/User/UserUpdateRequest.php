@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Panel\User\User;
 
+use App\Enum\Common\StatusEnum;
 use App\Models\User\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -38,6 +39,7 @@ class UserUpdateRequest extends FormRequest
             ],
             'full_name' => 'nullable|string',
             'role_id'   => 'required|string|exists:roles,uuid',
+            'status' => 'nullable|string|in:' . implode(',', StatusEnum::values()),
         ];
     }
 }

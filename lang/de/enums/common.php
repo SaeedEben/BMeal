@@ -3,6 +3,6 @@
 return [
     'status' => [
         'active'     => 'Aktiv',
-        'not_active' => 'Inaktiv',
+        'inactive' => 'Inaktiv',
     ],
 ];

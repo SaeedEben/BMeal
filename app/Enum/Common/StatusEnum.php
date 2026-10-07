@@ -5,7 +5,7 @@ namespace App\Enum\Common;
 enum StatusEnum: string
 {
     case ACTIVE = 'active';
-    case NOT_ACTIVE = 'not_active';
+    case INACTIVE = 'inactive';
 
     public function label(): string
     {

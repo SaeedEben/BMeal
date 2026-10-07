@@ -101,7 +101,7 @@ class UserController extends Controller
     {
         $validated = $request->only([
             'email', 'full_name',
-            'role_id',
+            'role_id', 'status'
         ]);
 
         try {
