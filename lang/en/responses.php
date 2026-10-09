@@ -41,7 +41,7 @@ return [
         'index'   => 'Countries list',
         'show'    => 'Country data',
         'store'   => 'Country created successfully.',
-        'update'  => 'Country updated successfully.',
+      'update'  => 'Country updated successfully.',
         'destroy' => 'Country deleted successfully.',
     ],
 
@@ -97,6 +97,7 @@ return [
         'auth' => [
             'verification' => 'Verification code sent to your email.',
             'verification_success' => 'Email verified successfully.',
+            'password_reset_success' => 'Password updated successfully.',
         ]
     ],
 ];

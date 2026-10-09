@@ -23,7 +23,7 @@ class EmailVerificationCode extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Email verification code',
+            subject: 'Account verification code',
         );
     }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Auth\ForgetPasswordRequest;
 use App\Http\Requests\Api\Auth\LoginRequest;
 use App\Http\Requests\Api\Auth\RegisterRequest;
 use App\Http\Requests\Api\Auth\VerifyRequest;
@@ -12,7 +13,6 @@ use App\Models\User\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
@@ -80,29 +80,12 @@ class AuthController extends Controller
             $user->assignRole($customerRole);
         }
 
-        $challengeToken = Str::random(64);
-        // $verificationCode = (string) random_int(100000, 999999);
-        $verificationCode       = '336699';
-        $cache                  = Cache::store('redis');
-        $emailCacheKey          = 'email-verification-email:'.hash('sha256', Str::lower($user->email));
-        $previousChallengeToken = $cache->get($emailCacheKey);
+        $challengeToken = $this->issueEmailChallenge($user, 'register');
 
-        if (is_string($previousChallengeToken)) {
-            $cache->forget('email-verification:'.$previousChallengeToken);
-        }
-
-        $expiresAt = now()->addMinutes(self::VERIFICATION_TTL_MINUTES);
-
-        $cache->put(
-            'email-verification:'.$challengeToken,
-            ['user_id' => (string) $user->getKey(), 'code' => $verificationCode],
-            $expiresAt
+        return self::success(
+            ['challenge_token' => $challengeToken, 'purpose' => 'register'],
+            __('responses.api.auth.verification')
         );
-        $cache->put($emailCacheKey, $challengeToken, $expiresAt);
-
-        // Mail::to($user->email)->send(new EmailVerificationCode($verificationCode));
-
-        return self::success(['challenge_token' => $challengeToken], __('responses.api.auth.verification'));
     }
 
     /**
@@ -112,69 +95,116 @@ class AuthController extends Controller
     {
         $data = $request->validated();
         $cache = Cache::store('redis');
-        $cacheKey = 'email-verification:'.$data['challenge_token'];
+        $purpose = $data['purpose'];
+        $cacheKey = $this->emailChallengeCacheKey($purpose, $data['challenge_token']);
         $challenge = $cache->get($cacheKey);
 
         if (
             ! is_array($challenge) ||
-            ! isset($challenge['user_id'], $challenge['code']) ||
+            ! isset($challenge['user_id'], $challenge['email'], $challenge['purpose'], $challenge['code']) ||
+            ! is_string($challenge['email']) ||
+            $challenge['purpose'] !== $purpose ||
             ! is_string($challenge['code']) ||
             ! hash_equals($challenge['code'], $data['code'])
         ) {
             return self::error(__('responses.errors.auth.verify_code_failed'), null, 400);
         }
 
+        $emailCacheKey = $this->emailChallengeIndexKey($purpose, $challenge['email']);
+
+        if ($cache->get($emailCacheKey) !== $data['challenge_token']) {
+            return self::error(__('responses.errors.auth.verify_code_failed'), null, 400);
+        }
+
         $user = User::query()->find($challenge['user_id']);
 
-        if (! $user) {
+        if (! $user || Str::lower($user->email) !== $challenge['email']) {
             $cache->forget($cacheKey);
+            $cache->forget($emailCacheKey);
 
             return self::error(__('responses.errors.auth.verify_code_failed'), null, 400);
         }
 
-        if ($user->email_verified_at !== null) {
-            $cache->forget($cacheKey);
+        if ($purpose === 'register') {
+            if ($user->email_verified_at !== null) {
+                $cache->forget($cacheKey);
+                $cache->forget($emailCacheKey);
 
-            return self::error(__('responses.errors.auth.login_failed'), null, 400);
+                return self::error(__('responses.errors.auth.verify_code_failed'), null, 400);
+            }
+
+            $user->forceFill(['email_verified_at' => now()])->save();
+        } else {
+            $user->forceFill(['password' => $data['password']])->save();
         }
 
-        $user->forceFill(['email_verified_at' => now()])->save();
         $cache->forget($cacheKey);
+        $cache->forget($emailCacheKey);
 
-        $emailCacheKey = 'email-verification-email:'.hash('sha256', Str::lower($user->email));
+        $responseData = $purpose === 'register'
+            ? ['token' => $user->createToken('auth_token')->plainTextToken]
+            : null;
+        $message = $purpose === 'register'
+            ? __('responses.api.auth.verification_success')
+            : __('responses.api.auth.password_reset_success');
 
-        if ($cache->get($emailCacheKey) === $data['challenge_token']) {
-            $cache->forget($emailCacheKey);
-        }
-
-        return self::success(
-            ['token' => $user->createToken('auth_token')->plainTextToken],
-            __('responses.api.auth.verification_success')
-        );
+        return self::success($responseData, $message);
     }
 
     /**
      * Generate a password reset token and store it so the user can reset their password securely.
      */
-    public function forgetPassword(Request $request)
+    public function forgetPassword(ForgetPasswordRequest $request)
     {
-        // Confirm the supplied email belongs to an existing user account.
-        $request->validate([
-            'email' => 'required|email|exists:users,email',
-        ]);
+        $data = $request->validated();
+        $user = User::query()->where('email', $data['email'])->firstOrFail();
+        $challengeToken = $this->issueEmailChallenge($user, 'forget_password');
 
-        // Create a secure random token to validate the password reset request.
-        $token = Str::random(60);
-
-        // Persist the token with the user's email so it can be checked during reset.
-        DB::table('password_reset_tokens')->updateOrInsert(
-            ['email' => $request->email],
-            ['token' => $token, 'created_at' => now()]
+        return self::success(
+            ['challenge_token' => $challengeToken, 'purpose' => 'forget_password'],
+            __('responses.api.auth.verification')
         );
+    }
 
-        // In a complete flow, send a reset email using the generated token.
-        // For example, queue a notification or mail template for the user.
+    private function issueEmailChallenge(User $user, string $purpose): string
+    {
+        $challengeToken = Str::random(64);
+        // $verificationCode = (string) random_int(100000, 999999);
+        $verificationCode = '336699';
+        $cache = Cache::store('redis');
+        $emailCacheKey = $this->emailChallengeIndexKey($purpose, $user->email);
+        $previousChallengeToken = $cache->get($emailCacheKey);
 
-        return self::success(['token' => $token], 'Password reset email sent');
+        if (is_string($previousChallengeToken)) {
+            $cache->forget($this->emailChallengeCacheKey($purpose, $previousChallengeToken));
+        }
+
+        $expiresAt = now()->addMinutes(self::VERIFICATION_TTL_MINUTES);
+
+        $cache->put(
+            $this->emailChallengeCacheKey($purpose, $challengeToken),
+            [
+                'user_id' => (string) $user->getKey(),
+                'email' => Str::lower($user->email),
+                'purpose' => $purpose,
+                'code' => $verificationCode,
+            ],
+            $expiresAt
+        );
+        $cache->put($emailCacheKey, $challengeToken, $expiresAt);
+
+        // Mail::to($user->email)->send(new EmailVerificationCode($verificationCode));
+
+        return $challengeToken;
+    }
+
+    private function emailChallengeCacheKey(string $purpose, string $challengeToken): string
+    {
+        return 'email-verification:'.$purpose.':'.$challengeToken;
+    }
+
+    private function emailChallengeIndexKey(string $purpose, string $email): string
+    {
+        return 'email-verification-email:'.$purpose.':'.hash('sha256', Str::lower($email));
     }
 }
