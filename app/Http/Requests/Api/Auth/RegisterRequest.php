@@ -4,6 +4,7 @@ namespace App\Http\Requests\Api\Auth;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class RegisterRequest extends FormRequest
 {
@@ -24,7 +25,11 @@ class RegisterRequest extends FormRequest
     {
         return [
             'full_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('users', 'email')->where(fn ($query) => $query->whereNotNull('email_verified_at')),
+            ],
             'password' => 'required|string|min:8|confirmed',
         ];
     }

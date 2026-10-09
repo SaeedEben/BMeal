@@ -3,13 +3,14 @@
 return [
     'errors' => [
         'auth' => [
-            'login_failed' => 'Invalid credentials.',
+            'login_failed'       => 'Invalid credentials.',
+            'verify_code_failed' => 'Invalid or expired verification code.',
         ],
         'unauthorized' => 'You are not authorized to perform this action.',
     ],
 
-    // PANEL ----------------------------------------------
-    // {User} ----------------------------------------------
+      // PANEL ----------------------------------------------
+      // {User} ----------------------------------------------
     'auth' => [
         'login'    => 'Welcome...',
         'logout'   => 'Logout Successfully.',
@@ -17,80 +18,85 @@ return [
         'register' => 'User registered successfully.',
     ],
     'users' => [
-        'index' => 'Users list',
-        'show' => 'User data',
-        'store' => 'User created successfully.',
-        'update' => 'User updated successfully.',
-        'destroy' => 'User deleted successfully.',
+        'index'           => 'Users list',
+        'show'            => 'User data',
+        'store'           => 'User created successfully.',
+        'update'          => 'User updated successfully.',
+        'destroy'         => 'User deleted successfully.',
         'change_password' => 'User password changed successfully.',
     ],
     'roles' => [
-        'index' => 'Roles list',
-        'show' => 'Role data',
-        'store' => 'Role created successfully.',
-        'update' => 'Role updated successfully.',
+        'index'   => 'Roles list',
+        'show'    => 'Role data',
+        'store'   => 'Role created successfully.',
+        'update'  => 'Role updated successfully.',
         'destroy' => 'Role deleted successfully.',
     ],
     'permissions' => [
         'index' => 'Permissions list',
     ],
 
-    // {Country} ----------------------------------------------
+      // {Country} ----------------------------------------------
     'countries' => [
-        'index' => 'Countries list',
-        'show' => 'Country data',
-        'store' => 'Country created successfully.',
-        'update' => 'Country updated successfully.',
+        'index'   => 'Countries list',
+        'show'    => 'Country data',
+        'store'   => 'Country created successfully.',
+        'update'  => 'Country updated successfully.',
         'destroy' => 'Country deleted successfully.',
     ],
 
-    // {Category} ----------------------------------------------
+      // {Category} ----------------------------------------------
     'categories' => [
-        'index' => 'Categories list',
-        'show' => 'Category data',
-        'store' => 'Category created successfully.',
-        'update' => 'Category updated successfully.',
+        'index'   => 'Categories list',
+        'show'    => 'Category data',
+        'store'   => 'Category created successfully.',
+        'update'  => 'Category updated successfully.',
         'destroy' => 'Category deleted successfully.',
     ],
 
-    // {Tag} ----------------------------------------------
+      // {Tag} ----------------------------------------------
     'tags' => [
-        'index' => 'Tags list',
-        'show' => 'Tag data',
-        'store' => 'Tag created successfully.',
-        'update' => 'Tag updated successfully.',
+        'index'   => 'Tags list',
+        'show'    => 'Tag data',
+        'store'   => 'Tag created successfully.',
+        'update'  => 'Tag updated successfully.',
         'destroy' => 'Tag deleted successfully.',
     ],
 
-    // {Unit} ----------------------------------------------
+      // {Unit} ----------------------------------------------
     'units' => [
-        'index' => 'Units list',
-        'show' => 'Unit data',
-        'store' => 'Unit created successfully.',
-        'update' => 'Unit updated successfully.',
+        'index'   => 'Units list',
+        'show'    => 'Unit data',
+        'store'   => 'Unit created successfully.',
+        'update'  => 'Unit updated successfully.',
         'destroy' => 'Unit deleted successfully.',
     ],
 
-    // {Ingredient} ----------------------------------------------
+      // {Ingredient} ----------------------------------------------
     'ingredients' => [
-        'index' => 'Ingredients list',
-        'show' => 'Ingredient data',
-        'store' => 'Ingredient created successfully.',
-        'update' => 'Ingredient updated successfully.',
+        'index'   => 'Ingredients list',
+        'show'    => 'Ingredient data',
+        'store'   => 'Ingredient created successfully.',
+        'update'  => 'Ingredient updated successfully.',
         'destroy' => 'Ingredient deleted successfully.',
     ],
 
-    // {Recipe} ----------------------------------------------
+      // {Recipe} ----------------------------------------------
     'recipes' => [
-        'index' => 'Recipes list',
-        'show' => 'Recipe data',
-        'store' => 'Recipe created successfully.',
-        'update' => 'Recipe updated successfully.',
+        'index'   => 'Recipes list',
+        'show'    => 'Recipe data',
+        'store'   => 'Recipe created successfully.',
+        'update'  => 'Recipe updated successfully.',
         'destroy' => 'Recipe deleted successfully.',
     ],
 
 
-    // Api ----------------------------------------------
-    // Auth ----------------------------------------------
-
+      // Api ----------------------------------------------
+      // Auth ----------------------------------------------
+    'api' => [
+        'auth' => [
+            'verification' => 'Verification code sent to your email.',
+            'verification_success' => 'Email verified successfully.',
+        ]
+    ],
 ];

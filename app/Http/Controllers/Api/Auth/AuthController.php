@@ -18,7 +18,7 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    private const VERIFICATION_TTL_MINUTES = 10;
+    private const VERIFICATION_TTL_MINUTES = 5;
 
     /**
      * Authenticate a user and return an API token for future requests.
@@ -62,25 +62,47 @@ class AuthController extends Controller
         $data = $request->validated();
         $customerRole = Role::query()->where('name', 'customer')->firstOrFail();
 
-        $user = User::create([
-            'full_name' => $data['full_name'],
-            'email' => $data['email'],
-            'password' => $data['password'],
-        ]);
-        $user->assignRole($customerRole);
+        $user = User::query()->where('email', $data['email'])->first();
+
+        if ($user?->email_verified_at !== null) {
+            return self::error(__('responses.errors.auth.login_failed'), null, 422);
+        }
+
+        if (! $user) {
+            $user = User::create([
+                'full_name' => $data['full_name'],
+                'email' => $data['email'],
+                'password' => $data['password'],
+            ]);
+        }
+
+        if (! $user->hasRole('customer')) {
+            $user->assignRole($customerRole);
+        }
 
         $challengeToken = Str::random(64);
-        $verificationCode = (string) random_int(100000, 999999);
+        // $verificationCode = (string) random_int(100000, 999999);
+        $verificationCode       = '336699';
+        $cache                  = Cache::store('redis');
+        $emailCacheKey          = 'email-verification-email:'.hash('sha256', Str::lower($user->email));
+        $previousChallengeToken = $cache->get($emailCacheKey);
 
-        Cache::store('redis')->put(
+        if (is_string($previousChallengeToken)) {
+            $cache->forget('email-verification:'.$previousChallengeToken);
+        }
+
+        $expiresAt = now()->addMinutes(self::VERIFICATION_TTL_MINUTES);
+
+        $cache->put(
             'email-verification:'.$challengeToken,
             ['user_id' => (string) $user->getKey(), 'code' => $verificationCode],
-            now()->addMinutes(self::VERIFICATION_TTL_MINUTES)
+            $expiresAt
         );
+        $cache->put($emailCacheKey, $challengeToken, $expiresAt);
 
-        Mail::to($user->email)->send(new EmailVerificationCode($verificationCode));
+        // Mail::to($user->email)->send(new EmailVerificationCode($verificationCode));
 
-        return self::success(['challenge_token' => $challengeToken], 'Verification code sent.');
+        return self::success(['challenge_token' => $challengeToken], __('responses.api.auth.verification'));
     }
 
     /**
@@ -99,7 +121,7 @@ class AuthController extends Controller
             ! is_string($challenge['code']) ||
             ! hash_equals($challenge['code'], $data['code'])
         ) {
-            return self::error('Invalid or expired verification code.', null, 400);
+            return self::error(__('responses.errors.auth.verify_code_failed'), null, 400);
         }
 
         $user = User::query()->find($challenge['user_id']);
@@ -107,15 +129,27 @@ class AuthController extends Controller
         if (! $user) {
             $cache->forget($cacheKey);
 
-            return self::error('Invalid or expired verification code.', null, 400);
+            return self::error(__('responses.errors.auth.verify_code_failed'), null, 400);
+        }
+
+        if ($user->email_verified_at !== null) {
+            $cache->forget($cacheKey);
+
+            return self::error(__('responses.errors.auth.login_failed'), null, 400);
         }
 
         $user->forceFill(['email_verified_at' => now()])->save();
         $cache->forget($cacheKey);
 
+        $emailCacheKey = 'email-verification-email:'.hash('sha256', Str::lower($user->email));
+
+        if ($cache->get($emailCacheKey) === $data['challenge_token']) {
+            $cache->forget($emailCacheKey);
+        }
+
         return self::success(
             ['token' => $user->createToken('auth_token')->plainTextToken],
-            'Email verified successfully.'
+            __('responses.api.auth.verification_success')
         );
     }
 

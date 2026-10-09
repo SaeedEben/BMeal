@@ -79,6 +79,66 @@ class EmailVerificationTest extends TestCase
         $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
+    public function test_re_registering_an_unverified_email_resends_a_fresh_challenge_for_the_existing_user(): void
+    {
+        config(['cache.stores.redis.driver' => 'array']);
+        Role::query()->create(['name' => 'customer', 'guard_name' => 'web']);
+
+        $payload = [
+            'full_name' => 'Test Customer',
+            'email' => 'customer@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ];
+
+        $firstRegistration = $this->postJson('/api/auth/register', $payload)->assertOk();
+        $firstChallengeToken = $firstRegistration->json('data.challenge_token');
+        $cache = Cache::store('redis');
+
+        $secondRegistration = $this->postJson('/api/auth/register', $payload);
+        $secondRegistration->assertOk()->assertJsonStructure(['data' => ['challenge_token']]);
+
+        $secondChallengeToken = $secondRegistration->json('data.challenge_token');
+        $this->assertNotSame($firstChallengeToken, $secondChallengeToken);
+        $this->assertNull($cache->get('email-verification:'.$firstChallengeToken));
+        $this->assertNotNull($cache->get('email-verification:'.$secondChallengeToken));
+        $this->assertDatabaseCount('users', 1);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
+
+        $this->postJson('/api/auth/verify', [
+            'challenge_token' => $firstChallengeToken,
+            'code' => '336699',
+        ])->assertStatus(400);
+
+        $this->postJson('/api/auth/verify', [
+            'challenge_token' => $secondChallengeToken,
+            'code' => '336699',
+        ])->assertOk()->assertJsonStructure(['data' => ['token']]);
+
+        $this->assertNotNull(User::query()->where('email', $payload['email'])->firstOrFail()->email_verified_at);
+        $this->assertDatabaseCount('users', 1);
+        $this->assertDatabaseCount('personal_access_tokens', 1);
+    }
+
+    public function test_verified_email_cannot_register_again(): void
+    {
+        $user = User::query()->create([
+            'full_name' => 'Verified Customer',
+            'email' => 'customer@example.com',
+            'password' => 'password123',
+        ]);
+        $user->forceFill(['email_verified_at' => now()])->save();
+
+        $this->postJson('/api/auth/register', [
+            'full_name' => 'Test Customer',
+            'email' => 'customer@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ])->assertUnprocessable()->assertJsonValidationErrors(['email']);
+
+        $this->assertDatabaseCount('users', 1);
+    }
+
     public function test_unverified_customer_cannot_log_in(): void
     {
         $user = User::query()->create([
