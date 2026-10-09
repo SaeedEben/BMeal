@@ -207,4 +207,9 @@ class AuthController extends Controller
     {
         return 'email-verification-email:'.$purpose.':'.hash('sha256', Str::lower($email));
     }
+
+    public function login_with_google(Request $request)
+    {
+        return self::error('Google login is not implemented yet.', null, 501);
+    }
 }
