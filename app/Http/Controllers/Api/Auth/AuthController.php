@@ -3,34 +3,44 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
-
+use App\Http\Requests\Api\Auth\LoginRequest;
+use App\Http\Requests\Api\Auth\RegisterRequest;
+use App\Http\Requests\Api\Auth\VerifyRequest;
+use App\Mail\EmailVerificationCode;
+use App\Models\User\Role;
+use App\Models\User\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
+    private const VERIFICATION_TTL_MINUTES = 10;
+
     /**
      * Authenticate a user and return an API token for future requests.
      */
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        // Validate the email and password fields before attempting authentication.
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
+        $credentials = $request->validated();
 
-        // Attempt to sign the user in with the provided credentials.
-        if (!Auth::attempt($request->only('email', 'password'))) {
-            return self::error('Invalid credentials', null, 401);
+        if (! Auth::attempt($credentials)) {
+            return self::error(__('responses.errors.auth.login_failed'), null, 401);
+        }
+
+        $user = Auth::user();
+
+        if (! ($user instanceof User) || ! $user->hasRole('customer') || $user->email_verified_at === null) {
+            return self::error(__('responses.errors.auth.login_failed'), null, 401);
         }
 
         // Create a personal access token for the authenticated user.
-        $token = $request->user()->createToken('auth_token')->plainTextToken;
+        $token = $user->createToken('auth_token')->plainTextToken;
 
-        return self::success(['token' => $token], 'Login successful');
+        return self::success(['token' => $token], __('responses.auth.login'));
     }
 
     /**
@@ -41,59 +51,72 @@ class AuthController extends Controller
         // Revoke the token currently attached to the authenticated user.
         $request->user()->currentAccessToken()->delete();
 
-        return self::success(null, 'Logout successful');
+        return self::success(null, __('responses.auth.logout'));
     }
 
     /**
-     * Register a new account and issue an API token for the created user.
+     * Register a customer and send an email verification challenge.
      */
-    public function register_shutdown_function(Request $request)
+    public function register(RegisterRequest $request)
     {
-        // Validate registration input and enforce unique email addresses.
-        $request->validate([
-            'full_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8|confirmed',
+        $data = $request->validated();
+        $customerRole = Role::query()->where('name', 'customer')->firstOrFail();
+
+        $user = User::create([
+            'full_name' => $data['full_name'],
+            'email' => $data['email'],
+            'password' => $data['password'],
         ]);
+        $user->assignRole($customerRole);
 
-        // Create the user record; the model handles hashing the password automatically.
-        $user = \App\Models\User::create([
-            'full_name' => $request->full_name,
-            'email' => $request->email,
-            'password' => $request->password,
-        ]);
+        $challengeToken = Str::random(64);
+        $verificationCode = (string) random_int(100000, 999999);
 
-        // Generate a token so the new user can authenticate immediately after signup.
-        $token = $user->createToken('auth_token')->plainTextToken;
+        Cache::store('redis')->put(
+            'email-verification:'.$challengeToken,
+            ['user_id' => (string) $user->getKey(), 'code' => $verificationCode],
+            now()->addMinutes(self::VERIFICATION_TTL_MINUTES)
+        );
 
-        return self::success(['token' => $token], 'Registration successful');
+        Mail::to($user->email)->send(new EmailVerificationCode($verificationCode));
+
+        return self::success(['challenge_token' => $challengeToken], 'Verification code sent.');
     }
 
     /**
-     * Verify that a supplied reset token matches the user email before treating the email as confirmed.
+     * Verify the email challenge and issue an authentication token.
      */
-    public function verifyEmail(Request $request)
+    public function verifyEmail(VerifyRequest $request)
     {
-        // Ensure email and verification token are present and in the expected format.
-        $request->validate([
-            'email' => 'required|email',
-            'token' => 'required|string',
-        ]);
+        $data = $request->validated();
+        $cache = Cache::store('redis');
+        $cacheKey = 'email-verification:'.$data['challenge_token'];
+        $challenge = $cache->get($cacheKey);
 
-        // Lookup the token in the password reset table for the given email.
-        $tokenData = DB::table('password_reset_tokens')
-            ->where('email', $request->email)
-            ->where('token', $request->token)
-            ->first();
-
-        if (!$tokenData) {
-            return self::error('Invalid token or email', null, 400);
+        if (
+            ! is_array($challenge) ||
+            ! isset($challenge['user_id'], $challenge['code']) ||
+            ! is_string($challenge['code']) ||
+            ! hash_equals($challenge['code'], $data['code'])
+        ) {
+            return self::error('Invalid or expired verification code.', null, 400);
         }
 
-        // This is the place where the application can mark the user's email as verified.
-        // For example, update a verified_at column on the users table.
+        $user = User::query()->find($challenge['user_id']);
 
-        return self::success(null, 'Email verified successfully');
+        if (! $user) {
+            $cache->forget($cacheKey);
+
+            return self::error('Invalid or expired verification code.', null, 400);
+        }
+
+        $user->forceFill(['email_verified_at' => now()])->save();
+        $cache->forget($cacheKey);
+
+        return self::success(
+            ['token' => $user->createToken('auth_token')->plainTextToken],
+            'Email verified successfully.'
+        );
     }
 
     /**

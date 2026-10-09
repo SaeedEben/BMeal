@@ -13,7 +13,7 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         Role::query()->firstOrCreate([
-            'name' => 'customer',
+            'name'       => 'customer',
             'guard_name' => 'web',
         ]);
     }

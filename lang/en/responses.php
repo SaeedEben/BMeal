@@ -7,11 +7,14 @@ return [
         ],
         'unauthorized' => 'You are not authorized to perform this action.',
     ],
+
+    // PANEL ----------------------------------------------
     // {User} ----------------------------------------------
     'auth' => [
-        'login' => 'Welcome...',
-        'logout' => 'Logout Successfully.',
-        'profile' => 'User profile data',
+        'login'    => 'Welcome...',
+        'logout'   => 'Logout Successfully.',
+        'profile'  => 'User profile data',
+        'register' => 'User registered successfully.',
     ],
     'users' => [
         'index' => 'Users list',
@@ -85,4 +88,9 @@ return [
         'update' => 'Recipe updated successfully.',
         'destroy' => 'Recipe deleted successfully.',
     ],
+
+
+    // Api ----------------------------------------------
+    // Auth ----------------------------------------------
+
 ];
