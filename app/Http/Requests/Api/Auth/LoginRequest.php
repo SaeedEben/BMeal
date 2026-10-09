@@ -23,8 +23,20 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            'email'    => ['required', 'string', 'email','exists:users,email'],
             'password' => ['required', 'string'],
+        ];
+    }
+
+     /**
+     * Get custom messages for registration validation.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'email.exists' => __('responses.errors.auth.login_failed'),
         ];
     }
 }

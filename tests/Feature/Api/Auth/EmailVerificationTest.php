@@ -143,7 +143,9 @@ class EmailVerificationTest extends TestCase
             'email' => 'customer@example.com',
             'password' => 'password123',
             'password_confirmation' => 'password123',
-        ])->assertUnprocessable()->assertJsonValidationErrors(['email']);
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors(['email'])
+            ->assertJsonPath('errors.email.0', 'This email is already registered.');
 
         $this->assertDatabaseCount('users', 1);
     }

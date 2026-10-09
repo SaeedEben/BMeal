@@ -33,4 +33,16 @@ class RegisterRequest extends FormRequest
             'password' => 'required|string|min:8|confirmed',
         ];
     }
+
+    /**
+     * Get custom messages for registration validation.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'email.unique' => __('responses.errors.auth.login_failed'),
+        ];
+    }
 }
