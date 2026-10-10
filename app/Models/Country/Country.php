@@ -22,7 +22,9 @@ use App\Models\File\File;
  * @property StatusEnum|string $status
  * @property Carbon $created_at
  * @property Carbon $updated_at
- * @property-read File|null $flag
+ *
+ * Relations ---------------------------
+ * @property-read File $flag
  */
 class Country extends Model
 {

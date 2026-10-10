@@ -14,6 +14,17 @@ class CountryShowResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            "id"           => $this->id,
+            "name"         => $this->name,
+            "code"         => $this->code,
+            "slug"         => $this->slug,
+            "description"  => $this->description,
+            "flag_id"      => $this->flag_id,
+            "flag_preview" => $this->flag->preview() ?? null,
+            "status"       => $this->status,
+            "created_at"   => $this->created_at,
+            "updated_at"   => $this->updated_at,
+        ];
     }
 }

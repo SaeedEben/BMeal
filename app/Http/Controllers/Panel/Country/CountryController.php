@@ -69,6 +69,8 @@ class CountryController extends Controller
             abort(403, __('responses.unauthorized'));
         }
 
+        $country->load('flag');
+
         return $this->resource(new CountryShowResource($country), __('responses.countries.show'));
     }
 
