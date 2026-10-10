@@ -90,6 +90,13 @@ return [
         'destroy' => 'Recipe deleted successfully.',
     ],
 
+      // {File} ----------------------------------------------
+    'files' => [
+        'show'    => 'File data',
+        'store'   => 'File created successfully.',
+        'destroy' => 'File deleted successfully.',
+    ],
+
 
       // Api ----------------------------------------------
       // Auth ----------------------------------------------

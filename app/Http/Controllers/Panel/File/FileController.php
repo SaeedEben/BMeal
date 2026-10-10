@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers\Panel\File;
 
+use App\Enum\File\TypeEnum;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Log;
-use App\Models\File\File;
 use App\Http\Requests\Panel\File\FileStoreRequest;
 use App\Http\Resources\Panel\File\FileShowResource;
-use Illuminate\Support\Facades\Storage;
+use App\Models\File\File;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class FileController extends Controller
 {
-   
     /**
      * Store a newly created resource in storage.
      */
@@ -21,20 +22,27 @@ class FileController extends Controller
         try {
 
             $uploadedFile = $request->file('file');
+            $fileType = $request->validated('file_type');
 
-            $path = $uploadedFile->store('files', 'local');
+            [$directory, $disk] = match ($fileType) {
+                TypeEnum::COUNTRY_FLAG->value => ['flags', 'public'],
+                TypeEnum::MEAL_PHOTO->value => ['meals', 'public'],
+                default => ['files', 'local'],
+            };
+
+            $path = $uploadedFile->store($directory, $disk);
 
             $file = File::create([
-                'name'              => $request->validated('name'),
-                'file_type'         => $request->validated('file_type'),
-                'mime_type'         => $uploadedFile->getMimeType(),
-                'size'              => $uploadedFile->getSize(),
-                'storage_path'      => $path,
-                'storage_provider'  => config('filesystems.default'),
-                'user_id'           => $request->user()->id,
+                'name'             => $uploadedFile->getClientOriginalName(),
+                'file_type'        => $fileType,
+                'mime_type'        => $uploadedFile->getMimeType(),
+                'size'             => $uploadedFile->getSize(),
+                'storage_path'     => $path,
+                'storage_provider' => $disk,
+                'user_id'          => $request->user()->id,
             ]);
 
-            return $this->success($file, 'File created successfully');
+            return $this->success(['id' => $file->id, 'preview' => $file->preview()], __('responses.files.store'));
 
         } catch (\Exception $exception) {
 
@@ -47,37 +55,41 @@ class FileController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(File $file): void
+    public function show(File $file): JsonResponse
     {
-        $this->resource(
-            new FileShowResource($file),
-            'File Show',
-            200
-        );
-    }
+        if (Gate::denies('PanelShow', $file)) {
+            abort(403, __('responses.unauthorized'));
+        }
 
+        return $this->resource(new FileShowResource($file), __('responses.files.show'), 200);
+    }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(File $file): void
+    public function destroy(File $file): JsonResponse
     {
+        if (Gate::denies('PanelDelete', $file)) {
+            abort(403, __('responses.unauthorized'));
+        }
+
         try {
 
-            if ($file->storage_path && Storage::exists($file->storage_path)) {
-                Storage::delete($file->storage_path);
+            $storage = Storage::disk($file->disk());
+
+            if ($file->storage_path && $storage->exists($file->storage_path)) {
+                $storage->delete($file->storage_path);
             }
 
             $file->delete();
 
-            $this->success(message: 'Successfully Deleted');
+            return $this->success(message: __('responses.files.destroy'));
 
         } catch (\Exception $exception) {
 
             Log::error($exception->getMessage());
 
-            $this->error($exception->getMessage());
+            return $this->error($exception->getMessage());
         }
     }
-
 }

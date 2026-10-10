@@ -44,6 +44,14 @@ return [
             ],
         ],
 
+        'file' => [
+            'file' => [
+                'store',
+                'show',
+                'destroy',
+            ],
+        ],
+
         'recipe' => [
             'category' => [
                 'index',

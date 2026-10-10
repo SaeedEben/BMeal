@@ -3,6 +3,7 @@
 use App\Http\Controllers\Panel\Auth\AuthController;
 use App\Http\Controllers\Panel\Auth\ProfileController;
 use App\Http\Controllers\Panel\Country\CountryController;
+use App\Http\Controllers\Panel\File\FileController;
 use App\Http\Controllers\Panel\Recipe\CategoryController;
 use App\Http\Controllers\Panel\Recipe\IngredientsController;
 use App\Http\Controllers\Panel\Recipe\RecipeController;
@@ -39,6 +40,11 @@ Route::group(['prefix' => 'v1'], function () {
             // Country ------------------------------------------------------------------------
             Route::get('/country/list', [CountryController::class, 'list']);
             Route::apiResource('country', CountryController::class);
+        });
+
+        Route::group(['prefix' => 'files'], function () {
+            // File ------------------------------------------------------------------------
+            Route::apiResource('file', FileController::class);
         });
 
         Route::group(['prefix' => 'recipes'], function () {

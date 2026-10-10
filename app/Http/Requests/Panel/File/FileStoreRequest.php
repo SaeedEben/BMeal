@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Panel\File;
 
+use App\Enum\File\TypeEnum;
+use App\Models\File\File;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,7 +14,7 @@ class FileStoreRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user()->can('PanelStore', File::class);
     }
 
     /**
@@ -23,7 +25,8 @@ class FileStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'file'      => 'required|file|max:10240',
+            'file_type' => 'required|string|in:' . implode(',', array_column(TypeEnum::cases(), 'value')),
         ];
     }
 }
