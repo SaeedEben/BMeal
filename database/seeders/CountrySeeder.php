@@ -19,6 +19,8 @@ class CountrySeeder extends Seeder
             ['name' => 'Spain', 'code' => 'ES', 'slug' => 'spain'],
             ['name' => 'Italy', 'code' => 'IT', 'slug' => 'italy'],
             ['name' => 'Germany', 'code' => 'DE', 'slug' => 'germany'],
+            ['name' => 'France', 'code' => 'FR', 'slug' => 'france'],
+            ['name' => 'Greece', 'code' => 'GR', 'slug' => 'greece'],
         ];
 
         foreach ($countries as $country) {
