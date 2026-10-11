@@ -109,5 +109,10 @@ return [
             'profile' => 'Customer profile data',
             'profile_updated' => 'Customer profile updated successfully.',
         ],
+        'recipe' => [
+            'category' =>[
+                'list' => 'Recipe categories list',
+            ]
+        ]
     ],
 ];
