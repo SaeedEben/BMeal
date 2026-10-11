@@ -18,7 +18,10 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('status')->default('active');
-            $table->rememberToken();          
+
+            $table->foreignUuid('avatar')->nullable()->constrained('files')->nullOnDelete();
+
+            $table->rememberToken();
             $table->timestamp('last_active')->nullable();
             $table->timestamps();
         });

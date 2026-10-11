@@ -5,10 +5,12 @@ namespace App\Models\User;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use App\Enum\Common\StatusEnum;
+use App\Models\File\File;
 use Carbon\Carbon;
-use Database\Factories\UserFactory;
+use Database\Factories\User\UserFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -28,6 +30,9 @@ use Symfony\Component\Uid\Uuid;
  * @property Carbon|null $last_active
  * @property Carbon $created_at
  * @property Carbon $updated_at
+ *
+ * Relations ------------------------------------------
+ * @property File $avatar
  */
 class User extends Authenticatable
 {
@@ -45,6 +50,7 @@ class User extends Authenticatable
         'password',
         'last_active',
         'status',
+        'avatar',
     ];
 
     protected $hidden = [
@@ -72,6 +78,11 @@ class User extends Authenticatable
             'id',
             'uuid'
         )->where('model_type', self::class);
+    }
+
+    public function avatar(): BelongsTo
+    {
+        return $this->belongsTo(File::class, 'avatar');
     }
 
     // {Attributes} -------------------------------------------

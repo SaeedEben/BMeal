@@ -4,6 +4,7 @@ namespace App\Http\Requests\Api\Customer;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class CustomerUpdateProfileRequest extends FormRequest
 {
@@ -12,7 +13,7 @@ class CustomerUpdateProfileRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return Auth::check();
     }
 
     /**
