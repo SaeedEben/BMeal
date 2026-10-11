@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Customer\CustomerController;
+use App\Http\Controllers\Api\Recipe\CategoryController;
 use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,10 @@ Route::group(['prefix' => 'v1'], function () {
         // Customer profile routes
         Route::get('/customer/profile', [CustomerController::class, 'profile']);
         Route::put('/customer/profile', [CustomerController::class, 'updateProfile']);
+
+
+        // Category
+        Route::get('/recipe/categories', [CategoryController::class, 'list']);
 
         // Customer file routes
         // Route::get('/customer/files/{file}', [FileController::class, 'show'])->name('customer.files.show');

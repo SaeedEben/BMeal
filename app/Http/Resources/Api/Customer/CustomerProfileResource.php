@@ -29,7 +29,7 @@ class CustomerProfileResource extends JsonResource
             'created_at'        => $this->created_at,
             'updated_at'        => $this->updated_at,
             'categories'        => $this->categories,
-            'settings'          => $this->settings,
+            'notifications'     => $this->settings,
         ];
     }
 }
