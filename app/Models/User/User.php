@@ -6,6 +6,7 @@ namespace App\Models\User;
 
 use App\Enum\Common\StatusEnum;
 use App\Models\File\File;
+use App\Models\Recipe\Category;
 use Carbon\Carbon;
 use Database\Factories\User\UserFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -55,15 +56,15 @@ class User extends Authenticatable
 
     protected $hidden = [
         'password',
-        'remember_token'
+        'remember_token',
     ];
 
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
-            'password'          => 'hashed',
-            'status'            => StatusEnum::class,
+            'password' => 'hashed',
+            'status' => StatusEnum::class,
         ];
     }
 
@@ -101,6 +102,16 @@ class User extends Authenticatable
         return $this->roles
             ->flatMap(fn ($role) => $role->permissions)
             ->unique();
+    }
+
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class, 'user_categories');
+    }
+
+    public function settings(): BelongsTo
+    {
+        return $this->belongsTo(Setting::class, 'id', 'user_id');
     }
 
     // {Scopes} -----------------------------------------------

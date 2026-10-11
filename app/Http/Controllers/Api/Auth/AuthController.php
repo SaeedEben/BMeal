@@ -9,6 +9,7 @@ use App\Http\Requests\Api\Auth\RegisterRequest;
 use App\Http\Requests\Api\Auth\VerifyRequest;
 use App\Mail\EmailVerificationCode;
 use App\Models\User\Role;
+use App\Models\User\Setting;
 use App\Models\User\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -74,6 +75,8 @@ class AuthController extends Controller
                 'email' => $data['email'],
                 'password' => $data['password'],
             ]);
+
+            Setting::create(['user_id' => $user->getKey()]);
         }
 
         if (! $user->hasRole('customer')) {

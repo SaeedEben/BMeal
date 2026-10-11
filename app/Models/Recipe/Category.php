@@ -3,6 +3,7 @@
 namespace App\Models\Recipe;
 
 use App\Enum\Common\StatusEnum;
+use App\Models\User\User;
 use Carbon\Carbon;
 use Database\Factories\Recipe\CategoryFactory;
 use Illuminate\Database\Eloquent\Collection;
@@ -45,5 +46,10 @@ class Category extends Model
     public function recipes(): BelongsToMany
     {
         return $this->belongsToMany(Recipe::class, 'recipe_categories')->withPivot('status');
+    }
+
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'user_categories');
     }
 }

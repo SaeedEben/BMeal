@@ -39,6 +39,12 @@ class EmailVerificationTest extends TestCase
         $this->assertNull($user->email_verified_at);
         $this->assertTrue($user->hasRole('customer'));
         $this->assertIsArray($challenge);
+        $this->assertDatabaseHas('settings', [
+            'user_id' => $user->id,
+            'meal_reminder' => 0,
+            'shopping_list_reminder' => 0,
+            'weakly_planning_reminder' => 0,
+        ]);
         Mail::assertSent(
             EmailVerificationCode::class,
             fn (EmailVerificationCode $mail): bool => $mail->hasTo($user->email) && $mail->code === $challenge['code']
@@ -110,6 +116,7 @@ class EmailVerificationTest extends TestCase
         $this->assertNull($cache->get('email-verification:register:'.$firstChallengeToken));
         $this->assertNotNull($secondChallenge);
         $this->assertDatabaseCount('users', 1);
+        $this->assertDatabaseCount('settings', 1);
         $this->assertDatabaseCount('personal_access_tokens', 0);
 
         $this->postJson('/api/v1/auth/verify', [
