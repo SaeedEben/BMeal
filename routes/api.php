@@ -28,8 +28,9 @@ Route::group(['prefix' => 'v1'], function () {
 
         // Customer profile routes
         Route::get('/customer/profile', [CustomerController::class, 'profile']);
+        Route::get('/customer/profile/avatar', [CustomerController::class, 'profileAvatar'])
+            ->name('customer.profile.avatar');
         Route::put('/customer/profile', [CustomerController::class, 'updateProfile']);
-
 
         // Category
         Route::get('/recipe/categories', [CategoryController::class, 'list']);

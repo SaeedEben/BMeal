@@ -19,17 +19,17 @@ class CustomerProfileResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'                => $this->id,
-            'full_name'         => $this->full_name,
-            'email'             => $this->email,
+            'id' => $this->id,
+            'full_name' => $this->full_name,
+            'email' => $this->email,
             'email_verified_at' => $this->email_verified_at,
-            'avatar'            => $this->avatar?->preview(),
-            'status'            => $this->status,
-            'last_active'       => $this->last_active,
-            'created_at'        => $this->created_at,
-            'updated_at'        => $this->updated_at,
-            'categories'        => $this->categories,
-            'notifications'     => $this->settings,
+            'avatar' => $this->avatar ? route('api.customer.profile.avatar') : null,
+            'status' => $this->status,
+            'last_active' => $this->last_active,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+            'categories' => $this->categories,
+            'notifications' => $this->settings,
         ];
     }
 }

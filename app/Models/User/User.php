@@ -33,7 +33,7 @@ use Symfony\Component\Uid\Uuid;
  * @property Carbon $updated_at
  *
  * Relations ------------------------------------------
- * @property File $avatar
+ * @property-read File|null $avatarFile
  */
 class User extends Authenticatable
 {
@@ -81,7 +81,7 @@ class User extends Authenticatable
         )->where('model_type', self::class);
     }
 
-    public function avatar(): BelongsTo
+    public function avatarFile(): BelongsTo
     {
         return $this->belongsTo(File::class, 'avatar');
     }
