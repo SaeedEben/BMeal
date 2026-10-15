@@ -32,43 +32,46 @@ class CustomerController extends Controller
         $data = $request->validated();
 
         /** @var User $user */
-        $user         = User::findOrFail($auth->id);
-        $oldAvatar    = $user->avatarFile;
+        $user = User::findOrFail($auth->id);
         $uploadedFile = $request->file('file');
-        $disk         = 'local';
-        $path         = $uploadedFile->store('profiles/'.$user->id, $disk);
 
-        if (! is_string($path)) {
-            abort(500, 'Unable to store profile photo.');
-        }
+        if ($uploadedFile) {
+            $oldAvatar = $user->avatarFile;
+            $disk = 'local';
+            $path = $uploadedFile->store('profiles/'.$user->id, $disk);
 
-        try {
-            DB::transaction(function () use ($user, $uploadedFile, $disk, $path): void {
-                $avatar = File::create([
-                    'name'             => $uploadedFile->getClientOriginalName(),
-                    'file_type'        => TypeEnum::PROFILE_PHOTO,
-                    'mime_type'        => $uploadedFile->getMimeType(),
-                    'size'             => $uploadedFile->getSize(),
-                    'storage_path'     => $path,
-                    'storage_provider' => $disk,
-                ]);
+            if (! is_string($path)) {
+                abort(500, 'Unable to store profile photo.');
+            }
 
-                $user->avatarFile()->associate($avatar);
-                $user->save();
-            });
-        } catch (\Throwable $exception) {
-            Storage::disk($disk)->delete($path);
+            try {
+                DB::transaction(function () use ($user, $uploadedFile, $disk, $path): void {
+                    $avatar = File::create([
+                        'name' => $uploadedFile->getClientOriginalName(),
+                        'file_type' => TypeEnum::PROFILE_PHOTO,
+                        'mime_type' => $uploadedFile->getMimeType(),
+                        'size' => $uploadedFile->getSize(),
+                        'storage_path' => $path,
+                        'storage_provider' => $disk,
+                    ]);
 
-            throw $exception;
-        }
+                    $user->avatarFile()->associate($avatar);
+                    $user->save();
+                });
+            } catch (\Throwable $exception) {
+                Storage::disk($disk)->delete($path);
 
-        if ($oldAvatar && ! User::query()->where('avatar', $oldAvatar->getKey())->exists()) {
-            $oldStorage = Storage::disk($oldAvatar->disk());
-            $deleted = ! $oldStorage->exists($oldAvatar->storage_path)
-                || $oldStorage->delete($oldAvatar->storage_path);
+                throw $exception;
+            }
 
-            if ($deleted) {
-                $oldAvatar->delete();
+            if ($oldAvatar && ! User::query()->where('avatar', $oldAvatar->getKey())->exists()) {
+                $oldStorage = Storage::disk($oldAvatar->disk());
+                $deleted = ! $oldStorage->exists($oldAvatar->storage_path)
+                    || $oldStorage->delete($oldAvatar->storage_path);
+
+                if ($deleted) {
+                    $oldAvatar->delete();
+                }
             }
         }
 
@@ -117,5 +120,4 @@ class CustomerController extends Controller
             ]
         );
     }
-
 }

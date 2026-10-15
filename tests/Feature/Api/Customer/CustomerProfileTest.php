@@ -58,6 +58,33 @@ class CustomerProfileTest extends TestCase
             ->assertNotFound();
     }
 
+    public function test_null_profile_photo_keeps_existing_avatar_unchanged(): void
+    {
+        Storage::fake('local');
+        $customerRole = Role::query()->create(['name' => 'customer', 'guard_name' => 'web']);
+        $user = $this->createCustomer('owner@example.com', $customerRole);
+        $oldPath = 'profiles/'.$user->id.'/old-avatar.png';
+        Storage::disk('local')->put($oldPath, 'old avatar');
+        $oldAvatar = File::query()->create([
+            'name' => 'old-avatar.png',
+            'file_type' => 'profile_photo',
+            'mime_type' => 'image/png',
+            'size' => 10,
+            'storage_path' => $oldPath,
+            'storage_provider' => 'local',
+        ]);
+        $user->avatar = $oldAvatar->getKey();
+        $user->save();
+
+        $response = $this->actingAs($user, 'sanctum')->put('/api/v1/customer/profile', [
+            'file' => null,
+        ]);
+
+        $response->assertOk();
+        $this->assertSame($oldAvatar->getKey(), $user->fresh()->avatar);
+        $this->assertTrue(Storage::disk('local')->exists($oldPath));
+    }
+
     private function createCustomer(string $email, Role $role): User
     {
         $user = User::query()->create([
