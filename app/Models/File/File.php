@@ -72,7 +72,12 @@ class File extends Model
         /** @var \Illuminate\Filesystem\FilesystemAdapter $storage */
         $storage = Storage::disk($this->disk());
 
-        return $storage->url($this->storage_path);
+        $url = $storage->url($this->storage_path);
+
+        return str_starts_with($url, 'https://')
+            ? $url
+            : url($url);
+
     }
 
     // Attributes ------------------------------------------------------------------------

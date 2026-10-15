@@ -24,12 +24,12 @@ class CustomerUpdateProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file' => 'required|image|mimes:jpg,jpeg,png,webp|max:10240',
-            'meal_reminder' => 'nullable|boolean',
-            'shopping_list_reminder' => 'nullable|boolean',
+            'file'                     => 'required|image|mimes:jpg,jpeg,png,webp|max:10240',
+            'meal_reminder'            => 'nullable|boolean',
+            'shopping_list_reminder'   => 'nullable|boolean',
             'weakly_planning_reminder' => 'nullable|boolean',
-            'categories' => 'nullable|array',
-            'categories.*' => 'required|uuid|distinct|exists:categories,id',
+            'categories'               => 'nullable|array',
+            'categories.*'             => 'required|uuid|distinct|exists:categories,id',
         ];
     }
 }
