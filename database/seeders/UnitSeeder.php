@@ -15,11 +15,14 @@ class UnitSeeder extends Seeder
     public function run(): void
     {
         $units = [
+            // Weight
             ['name' => 'Gram', 'symbol' => 'g', 'type' => UnitTypeEnum::WEIGHT, 'is_metric' => true],
             ['name' => 'Kilogram', 'symbol' => 'kg', 'type' => UnitTypeEnum::WEIGHT, 'is_metric' => true],
             ['name' => 'Milligram', 'symbol' => 'mg', 'type' => UnitTypeEnum::WEIGHT, 'is_metric' => true],
             ['name' => 'Ounce', 'symbol' => 'oz', 'type' => UnitTypeEnum::WEIGHT, 'is_metric' => false],
             ['name' => 'Pound', 'symbol' => 'lb', 'type' => UnitTypeEnum::WEIGHT, 'is_metric' => false],
+
+            // Volume
             ['name' => 'Milliliter', 'symbol' => 'ml', 'type' => UnitTypeEnum::VOLUME, 'is_metric' => true],
             ['name' => 'Liter', 'symbol' => 'l', 'type' => UnitTypeEnum::VOLUME, 'is_metric' => true],
             ['name' => 'Teaspoon', 'symbol' => 'tsp', 'type' => UnitTypeEnum::VOLUME, 'is_metric' => false],
@@ -29,6 +32,8 @@ class UnitSeeder extends Seeder
             ['name' => 'Pint', 'symbol' => 'pt', 'type' => UnitTypeEnum::VOLUME, 'is_metric' => false],
             ['name' => 'Quart', 'symbol' => 'qt', 'type' => UnitTypeEnum::VOLUME, 'is_metric' => false],
             ['name' => 'Gallon', 'symbol' => 'gal', 'type' => UnitTypeEnum::VOLUME, 'is_metric' => false],
+
+            // Count
             ['name' => 'Piece', 'symbol' => 'pcs', 'type' => UnitTypeEnum::COUNT, 'is_metric' => false],
             ['name' => 'Clove', 'symbol' => 'clove', 'type' => UnitTypeEnum::COUNT, 'is_metric' => false],
             ['name' => 'Slice', 'symbol' => 'slice', 'type' => UnitTypeEnum::COUNT, 'is_metric' => false],
@@ -39,6 +44,9 @@ class UnitSeeder extends Seeder
             ['name' => 'Head', 'symbol' => 'head', 'type' => UnitTypeEnum::COUNT, 'is_metric' => false],
             ['name' => 'Stick', 'symbol' => 'stick', 'type' => UnitTypeEnum::COUNT, 'is_metric' => false],
             ['name' => 'Fillet', 'symbol' => 'fillet', 'type' => UnitTypeEnum::COUNT, 'is_metric' => false],
+
+            // Qualitative measurement
+            ['name' => 'To Taste', 'symbol' => 'to taste', 'type' => UnitTypeEnum::OTHER, 'is_metric' => false],
         ];
 
         $now = now();

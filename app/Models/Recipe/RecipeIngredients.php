@@ -7,9 +7,10 @@ use Carbon\Carbon;
 use Database\Factories\Recipe\RecipeIngredientsFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Symfony\Component\Uid\Uuid;
+use Illuminate\Support\Str;
 
 /**
  * @property Uuid|string $id
@@ -26,10 +27,16 @@ use Symfony\Component\Uid\Uuid;
  * @property-read Ingredient $ingredient
  * @property-read Unit|null $unit
  */
-class RecipeIngredients extends Model
+class RecipeIngredients extends Pivot
 {
     /** @use HasFactory<RecipeIngredientsFactory> */
     use HasFactory, HasUuids;
+
+    protected $table = 'recipe_ingredients';
+
+    public $incrementing = false;
+
+    protected $keyType = 'string';
 
     protected $fillable = [
         'recipe_id',
@@ -48,6 +55,15 @@ class RecipeIngredients extends Model
             'sort_order' => 'integer',
             'status' => StatusEnum::class,
         ];
+    }
+
+     protected static function booted(): void
+    {
+        static::creating(function (RecipeIngredients $pivot) {
+            if (empty($pivot->id)) {
+                $pivot->id = (string) Str::uuid7();
+            }
+        });
     }
 
     // Relations ------------------------------------------------------------------------

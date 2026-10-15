@@ -12,15 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('recipe_ingredients', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-
             $table->foreignUuid('recipe_id')->constrained('recipes')->cascadeOnDelete();
             $table->foreignUuid('ingredient_id')->constrained('ingredients')->cascadeOnDelete();
 
             $table->foreignUuid('unit_id')->nullable()->constrained('units')->nullOnDelete();
 
             $table->decimal('quantity', 10, 2)->nullable();
-            
+
             $table->string('notes', 255)->nullable();
             $table->unsignedSmallInteger('sort_order')->nullable()->default(0);
 

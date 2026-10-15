@@ -10,6 +10,7 @@ enum UnitTypeEnum: string
     case LENGTH     = 'length';
     case TEMPRATURE = 'temperature';
     case SIZE       = 'size';
+    case OTHER      = 'other';
 
     public function label(): string
     {
