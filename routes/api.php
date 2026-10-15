@@ -29,6 +29,8 @@ Route::group(['prefix' => 'v1'], function () {
         // Customer profile routes
         Route::get('/customer/profile', [CustomerController::class, 'profile']);
         Route::put('/customer/profile', [CustomerController::class, 'updateProfile']);
+        Route::get('/private-files/{file}', [CustomerController::class, 'showAvatar'])
+            ->name('private-files.showAvatar');
 
         // Category
         Route::get('/recipe/categories', [CategoryController::class, 'list']);

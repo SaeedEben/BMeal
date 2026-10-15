@@ -83,4 +83,39 @@ class CustomerController extends Controller
         return self::resource(CustomerProfileResource::make($user), __('responses.api.customer.profile_updated'));
     }
 
+    public function showAvatar($file): StreamedResponse
+    {
+        $file = File::findOrFail($file);
+
+        $storage = Storage::disk($file->disk());
+
+        abort_unless(
+            $storage->exists($file->storage_path),
+            404
+        );
+
+        return response()->stream(
+            function () use ($storage, $file) {
+                $stream = $storage->readStream($file->storage_path);
+
+                if ($stream === false) {
+                    abort(404);
+                }
+
+                try {
+                    fpassthru($stream);
+                } finally {
+                    fclose($stream);
+                }
+            },
+            200,
+            [
+                'Content-Type' => $file->mime_type
+                    ?: 'application/octet-stream',
+                'Cache-Control' => 'private, no-store',
+                'X-Content-Type-Options' => 'nosniff',
+            ]
+        );
+    }
+
 }

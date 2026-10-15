@@ -69,15 +69,14 @@ class File extends Model
 
     public function preview(): string
     {
+        if (str_contains($this->storage_path, 'profiles')) {
+            return route('api.private-files.showAvatar', ['file' => $this->getKey()]);
+        }
+
         /** @var \Illuminate\Filesystem\FilesystemAdapter $storage */
         $storage = Storage::disk($this->disk());
 
-        $url = $storage->url($this->storage_path);
-
-        return str_starts_with($url, 'https://')
-            ? $url
-            : url($url);
-
+        return $storage->url($this->storage_path);
     }
 
     // Attributes ------------------------------------------------------------------------
