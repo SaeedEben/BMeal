@@ -44,9 +44,12 @@ class UnitSeeder extends Seeder
             ['name' => 'Head', 'symbol' => 'head', 'type' => UnitTypeEnum::COUNT, 'is_metric' => false],
             ['name' => 'Stick', 'symbol' => 'stick', 'type' => UnitTypeEnum::COUNT, 'is_metric' => false],
             ['name' => 'Fillet', 'symbol' => 'fillet', 'type' => UnitTypeEnum::COUNT, 'is_metric' => false],
+            ['name' => 'Sheet', 'symbol' => 'sheet', 'type' => UnitTypeEnum::COUNT, 'is_metric' => false],
+            ['name' => 'Sprig', 'symbol' => 'sprig', 'type' => UnitTypeEnum::COUNT, 'is_metric' => false],
 
             // Qualitative measurement
             ['name' => 'To Taste', 'symbol' => 'to taste', 'type' => UnitTypeEnum::OTHER, 'is_metric' => false],
+            ['name' => 'Pinch', 'symbol' => 'pinch', 'type' => UnitTypeEnum::OTHER, 'is_metric' => false],
         ];
 
         $now = now();

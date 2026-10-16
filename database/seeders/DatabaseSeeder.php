@@ -42,5 +42,10 @@ class DatabaseSeeder extends Seeder
 
         $this->call(RoleSeeder::class);
 
+        Artisan::call('app:read-recipes italy/italian.json ');
+        Artisan::call('app:read-recipes france/french.json ');
+        Artisan::call('app:read-recipes mexico/mexican.json ');
+        Artisan::call('app:read-recipes greece/greek.json ');
+
     }
 }
