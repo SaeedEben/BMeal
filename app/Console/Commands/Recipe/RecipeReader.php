@@ -3,8 +3,10 @@
 namespace App\Console\Commands\Recipe;
 
 use App\Models\Country\Country;
+use App\Models\Recipe\Category;
 use App\Models\Recipe\Ingredient;
 use App\Models\Recipe\Recipe;
+use App\Models\Recipe\Tag;
 use App\Models\Recipe\Unit;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
@@ -52,6 +54,12 @@ class RecipeReader extends Command
 
                 return $newRecipe;
             });
+
+            $categories = Category::query()->whereIn('name', $recipe['categories'])->pluck('id')->toArray();
+            $newRecipe->categories()->syncWithoutDetaching($categories);
+
+            $tags = Tag::query()->whereIn('name', $recipe['tags'])->pluck('id')->toArray();
+            $newRecipe->tags()->syncWithoutDetaching($tags);
 
             foreach ($recipe['steps'] as $step){;
                 $this->info("add step: {$step['step_number']}");
