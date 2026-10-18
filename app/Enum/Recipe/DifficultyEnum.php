@@ -10,7 +10,7 @@ enum DifficultyEnum: string
 
     public function label(): string
     {
-        return __("enums.recipe.difficulty.{$this->value}");
+        return __("enums/recipe.difficulty.{$this->value}");
     }
 
     public static function values(): array

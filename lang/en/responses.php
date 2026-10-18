@@ -113,8 +113,13 @@ return [
             'category' =>[
                 'list' => 'Recipe categories list',
             ],
+            'tag' =>[
+                'list' => 'Recipe tags list',
+            ],
             'recipes' =>[
                 'index' => 'Recipes list',
+                'meal_types_list' => 'Meal types list',
+                'difficulties_list' => 'Difficulties list',
             ],
         ]
     ],

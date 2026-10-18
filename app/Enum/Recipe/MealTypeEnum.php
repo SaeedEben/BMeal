@@ -15,7 +15,7 @@ enum MealTypeEnum: string
 
     public function label(): string
     {
-        return __("enums.meal_type.types.{$this->value}");
+        return __("enums/recipe.meal_types.{$this->value}");
     }
 
     public static function values(): array

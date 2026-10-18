@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\Api\Recipe;
 
+use App\Enum\Recipe\DifficultyEnum;
+use App\Enum\Recipe\MealTypeEnum;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Recipe\Recipe\RecipeDifficultiesListRequest;
 use App\Http\Requests\Api\Recipe\Recipe\RecipeIndexRequest;
+use App\Http\Requests\Api\Recipe\Recipe\RecipeMealTypeListRequest;
 use App\Http\Resources\Api\Recipe\Recipe\RecipeIndexResource;
 use App\Models\Recipe\Recipe;
 use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class RecipeController extends Controller
@@ -54,5 +57,20 @@ class RecipeController extends Controller
 
             return $this->error();
         }
+    }
+
+
+    public function mealTypesList(RecipeMealTypeListRequest $request)
+    {
+        $mealTypes = MealTypeEnum::options();
+
+        return $this->collection($mealTypes, __('responses.api.recipe.recipes.meal_types_list'));
+    }
+
+    public function difficultiesList(RecipeDifficultiesListRequest $request)
+    {
+        $difficulties = DifficultyEnum::options();
+
+        return $this->collection($difficulties, __('responses.api.recipe.recipes.difficulties_list'));
     }
 }
