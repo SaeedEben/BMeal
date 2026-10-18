@@ -112,7 +112,10 @@ return [
         'recipe' => [
             'category' =>[
                 'list' => 'Recipe categories list',
-            ]
+            ],
+            'recipes' =>[
+                'index' => 'Recipes list',
+            ],
         ]
     ],
 ];
