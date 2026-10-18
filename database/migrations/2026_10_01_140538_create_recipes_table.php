@@ -19,7 +19,8 @@ return new class extends Migration
             $table->string('name', 200);
             $table->string('slug', 220)->unique();
             $table->text('description')->nullable();
-            $table->string('image', 500)->nullable();
+            $table->foreignUuid('image_id')->nullable()->constrained('files')->nullOnDelete();
+
             $table->string('meal_type', 100)->nullable();
 
             $table->unsignedSmallInteger('prep_time_minutes')->nullable();

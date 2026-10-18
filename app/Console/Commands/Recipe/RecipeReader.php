@@ -35,7 +35,7 @@ class RecipeReader extends Command
         $country = explode('/', $address)[0];
 
         $countryId = Country::query()->where('slug', $country)->firstOrFail()->id;
-        $nationality = pathinfo($address, PATHINFO_FILENAME);
+        $nationality = pathinfo($country, PATHINFO_FILENAME);
 
         foreach ($data as $recipe) {
             $this->info("Inserting recipe: {$recipe['name']}");
@@ -105,9 +105,11 @@ class RecipeReader extends Command
         $storage = Storage::disk('public');
 
         foreach (['jpg', 'jpeg', 'webp', 'png'] as $extension) {
-            $path = "meal/{$nationality}/{$recipe->name}.{$extension}";
+            $path = "meals/{$nationality}/{$recipe->name}.{$extension}";
 
             if (! $storage->exists($path)) {
+                $this->info("No image: meals/{$nationality}/{$recipe->name}.{$extension}");
+
                 continue;
             }
 
@@ -118,7 +120,7 @@ class RecipeReader extends Command
             };
 
             DB::transaction(function () use ($recipe, $storage, $path, $mimeType): void {
-                $file = File::query()->firstOrCreate(
+                $file = File::query()->updateOrCreate(
                     [
                         'storage_path' => $path,
                         'storage_provider' => StorageEnum::PUBLIC->value,
@@ -131,7 +133,10 @@ class RecipeReader extends Command
                     ],
                 );
 
-                $recipe->update(['image' => $file->getKey()]);
+                $this->info("File Key: {$file->id}");
+
+                $recipe->image()->associate($file);
+                $recipe->save();
             });
 
             return;

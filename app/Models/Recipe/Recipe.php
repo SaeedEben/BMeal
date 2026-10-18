@@ -5,6 +5,7 @@ namespace App\Models\Recipe;
 use App\Enum\Common\StatusEnum;
 use App\Enum\Recipe\DifficultyEnum;
 use App\Models\Country\Country;
+use App\Models\File\File;
 use Carbon\Carbon;
 use Database\Factories\Recipe\RecipeFactory;
 use Illuminate\Database\Eloquent\Collection;
@@ -50,13 +51,14 @@ class Recipe extends Model
         'name',
         'slug',
         'description',
-        'image',
+        'image_id',
         'prep_time_minutes',
         'cook_time_minutes',
         'servings',
         'difficulty',
         'calories_per_serving',
         'status',
+        'meal_type',
     ];
 
     protected function casts(): array
@@ -102,5 +104,10 @@ class Recipe extends Model
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class, 'recipe_tags')->withPivot('status');
+    }
+
+    public function image(): BelongsTo
+    {
+        return $this->belongsTo(File::class, 'image_id');
     }
 }
