@@ -4,7 +4,7 @@ namespace App\Enum\Recipe;
 
 enum MealTypeEnum: string
 {
-    case BREAKFAST = 'brekfast';
+    case BREAKFAST = 'breakfast';
     case LUNCH     = 'lunch';
     case DINNER    = 'dinner';
     case DESSERT   = 'dessert';

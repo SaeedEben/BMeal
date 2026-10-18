@@ -43,6 +43,7 @@ class RecipeReader extends Command
                     "name"                 => $recipe["name"],
                     "slug"                 => $recipe["slug"],
                     "country_id"           => $countryId,
+                    "meal_type"            => $recipe["meal_type"],
                     "status"               => $recipe["status"],
                     "description"          => $recipe["description"],
                     "prep_time_minutes"    => $recipe["prep_time_minutes"],
