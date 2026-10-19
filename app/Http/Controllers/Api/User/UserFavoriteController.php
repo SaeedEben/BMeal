@@ -18,10 +18,10 @@ class UserFavoriteController extends Controller
         $user = Auth::user();
 
         $favorites = UserFavorite::query()
-            ->with('recipe', 'recipe.ingredients', 'recipe.tags', 'recipe.categories')
+            ->with('recipe', 'recipe.recipeIngredients', 'recipe.tags', 'recipe.categories')
             ->where('user_id', $user->id)
-            ->get()
-            ->orderByDesc('created_at');
+            ->orderByDesc('created_at')
+            ->get();
 
         return $this->resource(UserFavoriteIndexResource::collection($favorites), __('responses.api.user.favorites.index'));
     }
@@ -33,7 +33,7 @@ class UserFavoriteController extends Controller
         $validated = $request->validated();
 
         $favorite = DB::transaction(function () use ($user, $validated){
-             return UserFavorite::updateOrCreate(
+             return UserFavorite::firstOrCreate(
                 [
                     'user_id' => $user->id,
                     'recipe_id' => $validated['recipe_id'],
@@ -45,7 +45,7 @@ class UserFavoriteController extends Controller
             );
         });
 
-        return $this->resource($favorite, __('responses.api.user.favorites.store'));
+        return $this->success($favorite, __('responses.api.user.favorites.store'));
     }
 
     public function destroy(UserFavoriteStoreRequest $request)

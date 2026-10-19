@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\Customer\CustomerController;
 use App\Http\Controllers\Api\Recipe\CategoryController;
 use App\Http\Controllers\Api\Recipe\RecipeController;
 use App\Http\Controllers\Api\Recipe\TagController;
+use App\Http\Controllers\Api\User\UserFavoriteController;
 use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -45,6 +46,14 @@ Route::group(['prefix' => 'v1'], function () {
             Route::get('/difficulties', [RecipeController::class, 'difficultiesList']);
             // Recipe
             Route::get('/recipes', [RecipeController::class , 'index']);
+
+        });
+
+        Route::group(['prefix' => 'user'], function () {
+            // Favorites
+            Route::get('/favorites', [UserFavoriteController::class, 'index']);
+            Route::post('/favorites', [UserFavoriteController::class, 'store']);
+            Route::delete('/favorites', [UserFavoriteController::class, 'destroy']);
 
         });
         // Customer file routes
