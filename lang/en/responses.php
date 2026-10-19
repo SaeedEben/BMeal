@@ -121,6 +121,13 @@ return [
                 'meal_types_list' => 'Meal types list',
                 'difficulties_list' => 'Difficulties list',
             ],
-        ]
+        ],
+        'user' => [
+            'favorites' => [
+                'index'   => 'User favorites list',
+                'store'   => 'Recipe added to favorites successfully',
+                'destroy' => 'Recipe removed from favorites successfully',
+            ]
+        ],
     ],
 ];
