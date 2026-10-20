@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class MealPlanControlelr extends Controller
 {
-    public function index(MealPlanIndexRequest $request)
+    public function show(MealPlanIndexRequest $request)
     {
         $validated = $request->validated();
 
