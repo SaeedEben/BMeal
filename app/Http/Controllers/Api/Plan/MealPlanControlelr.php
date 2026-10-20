@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api\Plan;
 
 use App\Enum\Common\StatusEnum;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Plan\MealPlanIndexRequest;
 use App\Http\Requests\Api\Plan\MealPlanStoreRequest;
+use App\Http\Resources\Api\Plan\MealPlanIndexResource;
 use App\Models\Plan\MealPlan;
 use App\Models\Plan\MealPlanItem;
 use Illuminate\Http\Request;
@@ -12,6 +14,17 @@ use Illuminate\Support\Facades\DB;
 
 class MealPlanControlelr extends Controller
 {
+    public function index(MealPlanIndexRequest $request)
+    {
+        $validated = $request->validated();
+
+        $mealPlans = MealPlan::query();
+
+        $mealPlans = $mealPlans->get();
+
+        return $this->collection(MealPlanIndexResource::collection($mealPlans), __('responses.api.plan.meal_plan.index'));
+    }
+
     public function store(MealPlanStoreRequest $request)
     {
         $validated = $request->validated();
@@ -28,10 +41,10 @@ class MealPlanControlelr extends Controller
             foreach ($validated['items'] as $item){
                 MealPlanItem::create([
                     'meal_plan_id' => $mealPlan->id,
-                    'recipe_id'    => $validated['recipe_id'],
-                    'date'         => $validated['date'],
-                    'meal_type'    => $validated['meal_type'],
-                    'servings'     => $validated['servings'],
+                    'recipe_id'    => $item['recipe_id'],
+                    'date'         => $item['date'],
+                    'meal_type'    => $item['meal_type'],
+                    'servings'     => $item['servings'],
                     'status'       => StatusEnum::ACTIVE,
 
                 ]);
@@ -39,5 +52,12 @@ class MealPlanControlelr extends Controller
         });
 
         return $this->success($mealPlan, __('responses.api.plan.meal_plan.store'));
+    }
+
+    public function destroy(MealPlan $mealPlan)
+    {
+        $mealPlan->delete();
+
+        return $this->success(message:__('responses.api.plan.meal_plan.destroy'));
     }
 }

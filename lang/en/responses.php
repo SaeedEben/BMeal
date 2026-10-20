@@ -131,7 +131,9 @@ return [
         ],
         'plan' =>[
             'meal_plan' => [
-                'store' => 'Meal Plan stored successfully',
+                'index'   => 'Meal Plan list',
+                'store'   => 'Meal Plan stored successfully',
+                'destroy' => 'Meal Plan delted successfully',
             ]
         ]
     ],

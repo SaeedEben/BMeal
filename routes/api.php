@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Customer\CustomerController;
+use App\Http\Controllers\Api\Plan\MealPlanControlelr;
 use App\Http\Controllers\Api\Recipe\CategoryController;
 use App\Http\Controllers\Api\Recipe\RecipeController;
 use App\Http\Controllers\Api\Recipe\TagController;
@@ -54,6 +55,14 @@ Route::group(['prefix' => 'v1'], function () {
             Route::get('/favorites', [UserFavoriteController::class, 'index']);
             Route::post('/favorites', [UserFavoriteController::class, 'store']);
             Route::delete('/favorites', [UserFavoriteController::class, 'destroy']);
+
+        });
+
+        Route::group(['prefix' => 'plan'], function () {
+            // Meal Plans
+            Route::get('/meal_plans', [MealPlanControlelr::class, 'index']);
+            Route::post('/meal_plans', [MealPlanControlelr::class, 'store']);
+            Route::delete('/meal_plans', [MealPlanControlelr::class, 'destroy']);
 
         });
         // Customer file routes
