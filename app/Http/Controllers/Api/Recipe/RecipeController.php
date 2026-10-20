@@ -9,22 +9,24 @@ use App\Http\Requests\Api\Recipe\Recipe\RecipeDifficultiesListRequest;
 use App\Http\Requests\Api\Recipe\Recipe\RecipeIndexRequest;
 use App\Http\Requests\Api\Recipe\Recipe\RecipeMealTypeListRequest;
 use App\Http\Resources\Api\Recipe\Recipe\RecipeIndexResource;
+use App\Http\Resources\Api\Recipe\Recipe\RecipeShowResource;
 use App\Models\Recipe\Recipe;
 use Exception;
 use Illuminate\Support\Facades\Log;
 
 class RecipeController extends Controller
 {
-    public function index(RecipeIndexRequest $request) {
+    public function index(RecipeIndexRequest $request)
+    {
         $validated = $request->validated();
 
-        try{
+        try {
             $recipes = Recipe::query();
 
             if ($request->has('search')) {
-                $recipes->where('name' , 'like', '%' . $validated['search'] . '%')
-                    ->orWhereHas('ingredients', function ($query) use($validated) {
-                        $query->where('name', 'like',  '%' . $validated['search'] . '%');
+                $recipes->where('name', 'like', '%'.$validated['search'].'%')
+                    ->orWhereHas('ingredients', function ($query) use ($validated) {
+                        $query->where('name', 'like', '%'.$validated['search'].'%');
                     });
             }
 
@@ -33,17 +35,17 @@ class RecipeController extends Controller
             }
 
             if ($request->has('country_id')) {
-                $recipes->where('country_id' , $validated['counntry_id']);
+                $recipes->where('country_id', $validated['counntry_id']);
             }
 
             if ($request->has('tag_id')) {
-                $recipes->whereHas('tags' , function ($query) use($validated) {
+                $recipes->whereHas('tags', function ($query) use ($validated) {
                     $query->where('id', $validated['tag_id']);
                 });
             }
 
             if ($request->has('category_id')) {
-                $recipes->whereHas('categories' , function ($query) use($validated) {
+                $recipes->whereHas('categories', function ($query) use ($validated) {
                     $query->where('id', $validated['category_id']);
                 });
             }
@@ -52,13 +54,19 @@ class RecipeController extends Controller
 
             return $this->resource(RecipeIndexResource::collection($recipes), __('responses.api.recipe.recipes.index'));
 
-        }catch(Exception $e) {
-            Log::error("Error in RecipeController@index: " . $e->getMessage(), ['exception' => $e]);
+        } catch (Exception $e) {
+            Log::error('Error in RecipeController@index: '.$e->getMessage(), ['exception' => $e]);
 
             return $this->error();
         }
     }
 
+    public function show(Recipe $recipe)
+    {
+        $recipe->load('country', 'steps', 'ingredients', 'categories', 'tags', 'image');
+
+        return $this->resource(new RecipeShowResource($recipe), __('responses.api.recipe.recipes.show'));
+    }
 
     public function mealTypesList(RecipeMealTypeListRequest $request)
     {

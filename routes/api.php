@@ -46,7 +46,8 @@ Route::group(['prefix' => 'v1'], function () {
             // Difficulties
             Route::get('/difficulties', [RecipeController::class, 'difficultiesList']);
             // Recipe
-            Route::get('/recipes', [RecipeController::class , 'index']);
+            Route::get('/recipes', [RecipeController::class, 'index']);
+            Route::get('/recipes/{recipe}', [RecipeController::class, 'show']);
 
         });
 

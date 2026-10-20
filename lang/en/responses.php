@@ -110,31 +110,32 @@ return [
             'profile_updated' => 'Customer profile updated successfully.',
         ],
         'recipe' => [
-            'category' =>[
+            'category' => [
                 'list' => 'Recipe categories list',
             ],
-            'tag' =>[
+            'tag' => [
                 'list' => 'Recipe tags list',
             ],
-            'recipes' =>[
+            'recipes' => [
                 'index' => 'Recipes list',
+                'show' => 'Recipe show details',
                 'meal_types_list' => 'Meal types list',
                 'difficulties_list' => 'Difficulties list',
             ],
         ],
         'user' => [
             'favorites' => [
-                'index'   => 'User favorites list',
-                'store'   => 'Recipe added to favorites successfully',
+                'index' => 'User favorites list',
+                'store' => 'Recipe added to favorites successfully',
                 'destroy' => 'Recipe removed from favorites successfully',
-            ]
+            ],
         ],
-        'plan' =>[
+        'plan' => [
             'meal_plan' => [
-                'index'   => 'Meal Plan list',
-                'store'   => 'Meal Plan stored successfully',
+                'index' => 'Meal Plan list',
+                'store' => 'Meal Plan stored successfully',
                 'destroy' => 'Meal Plan delted successfully',
-            ]
-        ]
+            ],
+        ],
     ],
 ];
