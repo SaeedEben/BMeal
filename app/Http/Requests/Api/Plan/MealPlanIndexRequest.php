@@ -24,7 +24,7 @@ class MealPlanIndexRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'week' => 'nullable|date',
         ];
     }
 }

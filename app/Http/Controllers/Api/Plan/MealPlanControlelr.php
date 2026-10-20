@@ -9,7 +9,7 @@ use App\Http\Requests\Api\Plan\MealPlanStoreRequest;
 use App\Http\Resources\Api\Plan\MealPlanIndexResource;
 use App\Models\Plan\MealPlan;
 use App\Models\Plan\MealPlanItem;
-use Illuminate\Http\Request;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class MealPlanControlelr extends Controller
@@ -18,11 +18,14 @@ class MealPlanControlelr extends Controller
     {
         $validated = $request->validated();
 
-        $mealPlans = MealPlan::query();
+        $weekStart = Carbon::parse($validated['week'] ?? now())->startOfWeek();
+        $weekEnd = $weekStart->copy()->endOfWeek();
 
-        $mealPlans = $mealPlans->get();
+        $mealPlans = MealPlan::query()->with('items')
+            ->whereBetween('week_start_date', [$weekStart, $weekEnd])
+            ->get();
 
-        return $this->collection(MealPlanIndexResource::collection($mealPlans), __('responses.api.plan.meal_plan.index'));
+        return $this->resource(MealPlanIndexResource::collection($mealPlans), __('responses.api.plan.meal_plan.index'));
     }
 
     public function store(MealPlanStoreRequest $request)
@@ -31,21 +34,21 @@ class MealPlanControlelr extends Controller
 
         $user_id = $request->user()->id;
 
-        $mealPlan = DB::transaction(function () use ($user_id , $validated){
-            $mealPlan =  MealPlan::create([
-                'user_id'         => $user_id,
+        $mealPlan = DB::transaction(function () use ($user_id, $validated) {
+            $mealPlan = MealPlan::create([
+                'user_id' => $user_id,
                 'week_start_date' => $validated['week_start_date'],
-                'status'          => StatusEnum::ACTIVE,
+                'status' => StatusEnum::ACTIVE,
             ]);
 
-            foreach ($validated['items'] as $item){
+            foreach ($validated['items'] as $item) {
                 MealPlanItem::create([
                     'meal_plan_id' => $mealPlan->id,
-                    'recipe_id'    => $item['recipe_id'],
-                    'date'         => $item['date'],
-                    'meal_type'    => $item['meal_type'],
-                    'servings'     => $item['servings'],
-                    'status'       => StatusEnum::ACTIVE,
+                    'recipe_id' => $item['recipe_id'],
+                    'date' => $item['date'],
+                    'meal_type' => $item['meal_type'],
+                    'servings' => $item['servings'],
+                    'status' => StatusEnum::ACTIVE,
 
                 ]);
             }
@@ -58,6 +61,6 @@ class MealPlanControlelr extends Controller
     {
         $mealPlan->delete();
 
-        return $this->success(message:__('responses.api.plan.meal_plan.destroy'));
+        return $this->success(message: __('responses.api.plan.meal_plan.destroy'));
     }
 }

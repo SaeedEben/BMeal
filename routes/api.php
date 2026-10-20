@@ -62,7 +62,7 @@ Route::group(['prefix' => 'v1'], function () {
             // Meal Plans
             Route::get('/meal_plans', [MealPlanControlelr::class, 'index']);
             Route::post('/meal_plans', [MealPlanControlelr::class, 'store']);
-            Route::delete('/meal_plans', [MealPlanControlelr::class, 'destroy']);
+            Route::delete('/meal_plans/{meal_plan}', [MealPlanControlelr::class, 'destroy']);
 
         });
         // Customer file routes
