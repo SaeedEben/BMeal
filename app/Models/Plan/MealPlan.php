@@ -4,7 +4,7 @@ namespace App\Models\Plan;
 
 use App\Enum\Common\StatusEnum;
 use Carbon\Carbon;
-use Database\Factories\MealPlanFactory;
+use Database\Factories\Plan\MealPlanFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,12 +15,13 @@ use Symfony\Component\Uid\Uuid;
 use App\Models\User\User;
 
 /**
- * @property Uuid|string $id
- * @property string $user_id
- * @property Carbon $week_start_date
- * @property StatusEnum|string $status
- * @property Carbon $created_at
- * @property Carbon $updated_at
+ * @property Uuid|string        $id
+ * @property string             $user_id
+ * @property Carbon             $week_start_date
+ * @property StatusEnum|string  $status
+ * @property Carbon             $created_at
+ * @property Carbon             $updated_at
+ * Relations ----------------------------------------
  * @property-read User $user
  * @property-read Collection<int, MealPlanItem> $items
  */

@@ -18,6 +18,8 @@ return new class extends Migration
             $table->foreignUuid('recipe_id')->constrained('recipes')->cascadeOnDelete();
             $table->date('date');
 
+            $table->string('meal_type', 50);
+
             $table->unsignedSmallInteger('servings')->nullable()->default(1);
 
             $table->string('status')->default('active');

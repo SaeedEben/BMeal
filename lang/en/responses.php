@@ -129,5 +129,10 @@ return [
                 'destroy' => 'Recipe removed from favorites successfully',
             ]
         ],
+        'plan' =>[
+            'meal_plan' => [
+                'store' => 'Meal Plan stored successfully',
+            ]
+        ]
     ],
 ];
