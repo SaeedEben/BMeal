@@ -17,7 +17,9 @@ return new class extends Migration
             $table->string('name', 150);
             $table->string('slug', 170)->unique();
             $table->text('description')->nullable();
-            
+
+            $table->foreignUuid('image_id')->nullable()->constrained('files')->nullOnDelete();
+
             $table->string('status')->default('active');
             $table->timestamps();
         });

@@ -74,8 +74,7 @@ class RecipeReader extends Command
                 $newRecipe->steps()->updateOrCreate([
                     'step_number' => $step['step_number'],
                     'instruction' => $step['instruction'],
-                    'image' => $step['image'],
-                    'status' => $step['status'],
+                    'status'      => $step['status'],
                 ]);
             }
 

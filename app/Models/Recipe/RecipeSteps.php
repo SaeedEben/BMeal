@@ -3,6 +3,7 @@
 namespace App\Models\Recipe;
 
 use App\Enum\Common\StatusEnum;
+use App\Models\File\File;
 use Carbon\Carbon;
 use Database\Factories\Recipe\RecipeStepsFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -16,7 +17,7 @@ use Symfony\Component\Uid\Uuid;
  * @property string $recipe_id
  * @property int $step_number
  * @property string $instruction
- * @property string|null $image
+ * @property string|null $image_id
  * @property StatusEnum|string $status
  * @property Carbon $created_at
  * @property Carbon $updated_at
@@ -31,7 +32,7 @@ class RecipeSteps extends Model
         'recipe_id',
         'step_number',
         'instruction',
-        'image',
+        'image_id',
         'status',
     ];
 
@@ -47,5 +48,10 @@ class RecipeSteps extends Model
     public function recipe(): BelongsTo
     {
         return $this->belongsTo(Recipe::class);
+    }
+
+    public function image(): BelongsTo
+    {
+        return $this->belongsTo(File::class, 'image_id');
     }
 }

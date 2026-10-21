@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('recipe_steps', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            
+
             $table->foreignUuid('recipe_id')->constrained('recipes')->cascadeOnDelete();
             $table->unsignedSmallInteger('step_number');
             $table->text('instruction');
-            $table->string('image', 500)->nullable();
+            $table->foreignUuid('image_id')->nullable()->constrained('files')->nullOnDelete();
 
             $table->unique(['recipe_id', 'step_number'], 'unique_recipe_step');
 

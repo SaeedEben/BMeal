@@ -7,8 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Panel\File\FileStoreRequest;
 use App\Http\Resources\Panel\File\FileShowResource;
 use App\Models\File\File;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -27,19 +27,20 @@ class FileController extends Controller
             [$directory, $disk] = match ($fileType) {
                 TypeEnum::COUNTRY_FLAG->value => ['flags', 'public'],
                 TypeEnum::MEAL_PHOTO->value => ['meals', 'public'],
+                TypeEnum::INGREDIENT_PHOTO->value => ['ingredients', 'public'],
                 default => ['files', 'local'],
             };
 
             $path = $uploadedFile->store($directory, $disk);
 
             $file = File::create([
-                'name'             => $uploadedFile->getClientOriginalName(),
-                'file_type'        => $fileType,
-                'mime_type'        => $uploadedFile->getMimeType(),
-                'size'             => $uploadedFile->getSize(),
-                'storage_path'     => $path,
+                'name' => $uploadedFile->getClientOriginalName(),
+                'file_type' => $fileType,
+                'mime_type' => $uploadedFile->getMimeType(),
+                'size' => $uploadedFile->getSize(),
+                'storage_path' => $path,
                 'storage_provider' => $disk,
-                'user_id'          => $request->user()->id,
+                'user_id' => $request->user()->id,
             ]);
 
             return $this->success(['id' => $file->id, 'preview' => $file->preview()], __('responses.files.store'));
