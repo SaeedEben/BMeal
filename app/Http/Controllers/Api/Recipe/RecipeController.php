@@ -23,7 +23,7 @@ class RecipeController extends Controller
             ->contains(fn (string $filter): bool => filled($validated[$filter] ?? null));
 
         try {
-            $recipes = Recipe::query();
+            $recipes = Recipe::query()->with('image');
 
             if (filled($validated['search'] ?? null)) {
                 $search = $validated['search'];
