@@ -57,7 +57,7 @@ class RecipeController extends Controller
             }
 
             if (! $hasFilters) {
-                $recipes->inRandomOrder()->limit(10);
+                $recipes->inRandomOrder()->limit(9);
             }
 
             $recipes = $recipes->get();
