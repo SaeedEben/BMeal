@@ -15,10 +15,11 @@ class IngredientsResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'name' => $this->name,
-            'slug' => $this->slug,
+            'name'        => $this->name,
+            'slug'        => $this->slug,
             'description' => $this->description,
-            'pivot' => new RecipeIngredientResource($this->pivot),
+            'image'       => $this->image?->preview(),
+            'pivot'       => new RecipeIngredientResource($this->pivot),
         ];
     }
 }
