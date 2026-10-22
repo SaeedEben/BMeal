@@ -3,6 +3,7 @@
 namespace App\Models\User;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Symfony\Component\Uid\Uuid;
@@ -21,6 +22,14 @@ use Symfony\Component\Uid\Uuid;
  */
 class Setting extends Model
 {
+    use HasUuids;
+
+    protected $primaryKey = 'id';
+
+    public $incrementing = false;
+
+    protected $keyType = 'string';
+
     protected $fillable = [
         'user_id',
         'meal_reminder',

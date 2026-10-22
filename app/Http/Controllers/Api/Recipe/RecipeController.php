@@ -19,35 +19,45 @@ class RecipeController extends Controller
     public function index(RecipeIndexRequest $request)
     {
         $validated = $request->validated();
+        $hasFilters = collect(['search', 'meal_type', 'country_id', 'tags', 'categories'])
+            ->contains(fn (string $filter): bool => filled($validated[$filter] ?? null));
 
         try {
             $recipes = Recipe::query();
 
-            if ($request->has('search')) {
-                $recipes->where('name', 'like', '%'.$validated['search'].'%')
-                    ->orWhereHas('ingredients', function ($query) use ($validated) {
-                        $query->where('name', 'like', '%'.$validated['search'].'%');
-                    });
+            if (filled($validated['search'] ?? null)) {
+                $search = $validated['search'];
+
+                $recipes->where(function ($query) use ($search) {
+                    $query->where('name', 'like', '%'.$search.'%')
+                        ->orWhereHas('ingredients', function ($query) use ($search) {
+                            $query->where('name', 'like', '%'.$search.'%');
+                        });
+                });
             }
 
-            if ($request->has('meal_type')) {
+            if (filled($validated['meal_type'] ?? null)) {
                 $recipes->where('meal_type', $validated['meal_type']);
             }
 
-            if ($request->has('country_id')) {
-                $recipes->where('country_id', $validated['counntry_id']);
+            if (filled($validated['country_id'] ?? null)) {
+                $recipes->where('country_id', $validated['country_id']);
             }
 
-            if ($request->has('tag_id')) {
+            if (filled($validated['tags'] ?? null)) {
                 $recipes->whereHas('tags', function ($query) use ($validated) {
-                    $query->where('id', $validated['tag_id']);
+                    $query->whereIn('tags.id', $validated['tags']);
                 });
             }
 
-            if ($request->has('category_id')) {
+            if (filled($validated['categories'] ?? null)) {
                 $recipes->whereHas('categories', function ($query) use ($validated) {
-                    $query->where('id', $validated['category_id']);
+                    $query->whereIn('categories.id', $validated['categories']);
                 });
+            }
+
+            if (! $hasFilters) {
+                $recipes->inRandomOrder()->limit(10);
             }
 
             $recipes = $recipes->get();
