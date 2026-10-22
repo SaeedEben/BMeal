@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Country\CountryController;
 use App\Http\Controllers\Api\Customer\CustomerController;
 use App\Http\Controllers\Api\Plan\MealPlanControlelr;
 use App\Http\Controllers\Api\Recipe\CategoryController;
@@ -49,6 +50,11 @@ Route::group(['prefix' => 'v1'], function () {
             Route::get('/recipes', [RecipeController::class, 'index']);
             Route::get('/recipes/{recipe}', [RecipeController::class, 'show']);
 
+        });
+
+        Route::group(['prefix' => 'country'], function () {
+            // Countries
+            Route::get('/list', [CountryController::class, 'list']);
         });
 
         Route::group(['prefix' => 'user'], function () {
