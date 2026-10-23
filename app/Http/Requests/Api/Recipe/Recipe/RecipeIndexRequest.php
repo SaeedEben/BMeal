@@ -24,11 +24,12 @@ class RecipeIndexRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'tags'         => 'nullable,array',
+            'tags'         => 'nullable|array',
             'tags.*'       => 'required|uuid|distinct|exists:tags,id',
-            'categories'   => 'nullable,array',
+            'categories'   => 'nullable|array',
             'categories.*' => 'required|uuid|distinct|exists:categories,id',
             'meal_type'    => 'nullable|string|in:' . implode(',', \App\Enum\Recipe\MealTypeEnum::values()),
+            'difficulty'   => 'nullable|string|in:' . implode(',', \App\Enum\Recipe\DifficultyEnum::values()),
             'country_id'   => 'nullable|uuid|exists:countries,id',
             'search'       => 'nullable|string|max:255',
         ];

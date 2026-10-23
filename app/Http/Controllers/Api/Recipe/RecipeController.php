@@ -40,6 +40,10 @@ class RecipeController extends Controller
                 $recipes->where('meal_type', $validated['meal_type']);
             }
 
+            if (filled($validated['difficulty'] ?? null)) {
+                $recipes->where('difficulty', $validated['difficulty']);
+            }
+
             if (filled($validated['country_id'] ?? null)) {
                 $recipes->where('country_id', $validated['country_id']);
             }
