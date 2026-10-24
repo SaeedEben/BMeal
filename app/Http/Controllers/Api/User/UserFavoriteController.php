@@ -66,4 +66,9 @@ class UserFavoriteController extends Controller
             return $this->error(__('responses.api.user.favorites.not_found'), 404);
         });
     }
+
+    public function recentlySaw()
+    {
+        
+    }
 }
