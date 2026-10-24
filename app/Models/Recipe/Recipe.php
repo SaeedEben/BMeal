@@ -6,6 +6,7 @@ use App\Enum\Common\StatusEnum;
 use App\Enum\Recipe\DifficultyEnum;
 use App\Models\Country\Country;
 use App\Models\File\File;
+use App\Models\User\UserFavorite;
 use Carbon\Carbon;
 use Database\Factories\Recipe\RecipeFactory;
 use Illuminate\Database\Eloquent\Collection;
@@ -95,6 +96,11 @@ class Recipe extends Model
     public function recipeIngredients(): HasMany
     {
         return $this->hasMany(RecipeIngredients::class);
+    }
+
+    public function userFavorites(): HasMany
+    {
+        return $this->hasMany(UserFavorite::class);
     }
 
     public function categories(): BelongsToMany

@@ -12,6 +12,7 @@ use App\Http\Resources\Api\Recipe\Recipe\RecipeIndexResource;
 use App\Http\Resources\Api\Recipe\Recipe\RecipeShowResource;
 use App\Models\Recipe\Recipe;
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Log;
 
 class RecipeController extends Controller
@@ -23,7 +24,12 @@ class RecipeController extends Controller
             ->contains(fn (string $filter): bool => filled($validated[$filter] ?? null));
 
         try {
-            $recipes = Recipe::query()->with('image');
+            $recipes = Recipe::query()
+                ->with('image')
+                ->withExists([
+                    'userFavorites as saved' => fn (Builder $query): Builder => $query
+                        ->where('user_id', $request->user()->id),
+                ]);
 
             if (filled($validated['search'] ?? null)) {
                 $search = $validated['search'];
