@@ -129,6 +129,9 @@ return [
                 'store' => 'Recipe added to favorites successfully',
                 'destroy' => 'Recipe removed from favorites successfully',
             ],
+            'recently_saw' => [
+                'index' => 'Recently viewed recipes list',
+            ],
         ],
         'plan' => [
             'meal_plan' => [

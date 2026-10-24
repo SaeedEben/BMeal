@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\User\Favorites\UserFavoriteIndexRequest;
 use App\Http\Requests\Api\User\Favorites\UserFavoriteStoreRequest;
 use App\Http\Resources\Api\User\Favorites\UserFavoriteIndexResource;
+use App\Models\User\RecentlySaw;
 use App\Models\User\UserFavorite;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -66,5 +67,19 @@ class UserFavoriteController extends Controller
         });
     }
 
-    public function recentlySaw() {}
+    public function recentlySaw(UserFavoriteIndexRequest $request)
+    {
+        $recentlySaw = RecentlySaw::query()
+            ->with('recipe.image')
+            ->where('user_id', $request->user()->id)
+            ->orderByDesc('created_at')
+            ->orderByDesc('recipe_id')
+            ->limit(9)
+            ->get();
+
+        return $this->resource(
+            UserFavoriteIndexResource::collection($recentlySaw),
+            __('responses.api.user.recently_saw.index'),
+        );
+    }
 }

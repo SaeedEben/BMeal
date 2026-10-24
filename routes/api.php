@@ -62,6 +62,7 @@ Route::group(['prefix' => 'v1'], function () {
             Route::get('/favorites', [UserFavoriteController::class, 'index']);
             Route::post('/favorites', [UserFavoriteController::class, 'store']);
             Route::delete('/favorites', [UserFavoriteController::class, 'destroy']);
+            Route::get('/recently_saw', [UserFavoriteController::class, 'recentlySaw']);
 
         });
 

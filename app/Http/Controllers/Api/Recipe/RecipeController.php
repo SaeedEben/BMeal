@@ -13,6 +13,8 @@ use App\Http\Resources\Api\Recipe\Recipe\RecipeShowResource;
 use App\Models\Recipe\Recipe;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class RecipeController extends Controller
@@ -81,8 +83,36 @@ class RecipeController extends Controller
         }
     }
 
-    public function show(Recipe $recipe)
+    public function show(Request $request, Recipe $recipe)
     {
+        $userId = $request->user()->id;
+
+        DB::transaction(function () use ($userId, $recipe): void {
+            DB::table('users')->where('id', $userId)->lockForUpdate()->first();
+
+            DB::table('recently_saws')->upsert(
+                [[
+                    'user_id' => $userId,
+                    'recipe_id' => $recipe->id,
+                    'created_at' => now(),
+                ]],
+                ['user_id', 'recipe_id'],
+                ['created_at'],
+            );
+
+            DB::table('recently_saws')
+                ->where('user_id', $userId)
+                ->whereNotIn('recipe_id', function ($query) use ($userId) {
+                    $query->select('recipe_id')
+                        ->from('recently_saws')
+                        ->where('user_id', $userId)
+                        ->orderByDesc('created_at')
+                        ->orderByDesc('recipe_id')
+                        ->limit(9);
+                })
+                ->delete();
+        });
+
         $recipe->load('country', 'steps', 'ingredients', 'categories', 'tags', 'image');
 
         return $this->resource(new RecipeShowResource($recipe), __('responses.api.recipe.recipes.show'));
