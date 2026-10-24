@@ -26,14 +26,13 @@ class UserFavoriteController extends Controller
         return $this->resource(UserFavoriteIndexResource::collection($favorites), __('responses.api.user.favorites.index'));
     }
 
-
     public function store(UserFavoriteStoreRequest $request)
     {
         $user = Auth::user();
         $validated = $request->validated();
 
-        $favorite = DB::transaction(function () use ($user, $validated){
-             return UserFavorite::firstOrCreate(
+        $favorite = DB::transaction(function () use ($user, $validated) {
+            return UserFavorite::firstOrCreate(
                 [
                     'user_id' => $user->id,
                     'recipe_id' => $validated['recipe_id'],
@@ -54,12 +53,12 @@ class UserFavoriteController extends Controller
         $validated = $request->validated();
 
         return DB::transaction(function () use ($user, $validated) {
-            $favorite = UserFavorite::where('user_id', $user->id)
-            ->where('recipe_id', $validated['recipe_id'])
-            ->first();
+            $deleted = UserFavorite::query()
+                ->where('user_id', $user->id)
+                ->where('recipe_id', $validated['recipe_id'])
+                ->delete();
 
-            if ($favorite) {
-                $favorite->delete();
+            if ($deleted > 0) {
                 return $this->success(__('responses.api.user.favorites.destroy'));
             }
 
@@ -67,8 +66,5 @@ class UserFavoriteController extends Controller
         });
     }
 
-    public function recentlySaw()
-    {
-
-    }
+    public function recentlySaw() {}
 }
