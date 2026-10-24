@@ -18,7 +18,7 @@ class UserFavoriteController extends Controller
         $user = Auth::user();
 
         $favorites = UserFavorite::query()
-            ->with('recipe', 'recipe.recipeIngredients', 'recipe.tags', 'recipe.categories')
+            ->with('recipe')
             ->where('user_id', $user->id)
             ->orderByDesc('created_at')
             ->get();
@@ -69,6 +69,6 @@ class UserFavoriteController extends Controller
 
     public function recentlySaw()
     {
-        
+
     }
 }
