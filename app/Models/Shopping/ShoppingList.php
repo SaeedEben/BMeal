@@ -15,13 +15,16 @@ use Symfony\Component\Uid\Uuid;
 use App\Models\User\User;
 
 /**
- * @property Uuid|string $id
- * @property string $user_id
- * @property string $name
- * @property StatusEnum|string $status
- * @property Carbon $created_at
- * @property Carbon $updated_at
- * @property-read User $user
+ * @property Uuid|string        $id
+ * @property string             $user_id
+ * @property string             $name
+ * @property Carbon             $week_date
+ * @property StatusEnum|string  $status
+ * @property Carbon             $created_at
+ * @property Carbon             $updated_at
+ *
+ * Relations ---------------------------------------
+ * @property-read User          $user
  * @property-read Collection<int, ShoppingListItem> $items
  */
 class ShoppingList extends Model
@@ -33,6 +36,7 @@ class ShoppingList extends Model
         'user_id',
         'name',
         'status',
+        'week_date'
     ];
 
     protected function casts(): array

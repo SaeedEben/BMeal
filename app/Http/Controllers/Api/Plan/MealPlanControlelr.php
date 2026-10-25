@@ -57,9 +57,9 @@ class MealPlanControlelr extends Controller
         return $this->success($mealPlan, __('responses.api.plan.meal_plan.store'));
     }
 
-    public function destroy(MealPlan $mealPlan)
+    public function destroy(MealPlanItem $mealPlanItem)
     {
-        $mealPlan->delete();
+        $mealPlanItem->delete();
 
         return $this->success(message: __('responses.api.plan.meal_plan.destroy'));
     }
