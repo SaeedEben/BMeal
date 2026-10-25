@@ -100,16 +100,16 @@ class RecipeController extends Controller
                 ['created_at'],
             );
 
+            $recentRecipeIds = DB::table('recently_saws')
+                ->where('user_id', $userId)
+                ->orderByDesc('created_at')
+                ->orderByDesc('recipe_id')
+                ->limit(9)
+                ->pluck('recipe_id');
+
             DB::table('recently_saws')
                 ->where('user_id', $userId)
-                ->whereNotIn('recipe_id', function ($query) use ($userId) {
-                    $query->select('recipe_id')
-                        ->from('recently_saws')
-                        ->where('user_id', $userId)
-                        ->orderByDesc('created_at')
-                        ->orderByDesc('recipe_id')
-                        ->limit(9);
-                })
+                ->whereNotIn('recipe_id', $recentRecipeIds)
                 ->delete();
         });
 
