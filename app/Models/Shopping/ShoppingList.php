@@ -3,6 +3,8 @@
 namespace App\Models\Shopping;
 
 use App\Enum\Common\StatusEnum;
+use App\Models\Plan\MealPlan;
+use App\Models\User\User;
 use Carbon\Carbon;
 use Database\Factories\ShoppingListFactory;
 use Illuminate\Database\Eloquent\Collection;
@@ -12,19 +14,20 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Symfony\Component\Uid\Uuid;
-use App\Models\User\User;
 
 /**
- * @property Uuid|string        $id
- * @property string             $user_id
- * @property string             $name
- * @property Carbon             $week_date
- * @property StatusEnum|string  $status
- * @property Carbon             $created_at
- * @property Carbon             $updated_at
+ * @property Uuid|string $id
+ * @property string $user_id
+ * @property string $meal_plan_id
+ * @property string $name
+ * @property Carbon $week_date
+ * @property StatusEnum|string $status
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  *
  * Relations ---------------------------------------
  * @property-read User          $user
+ * @property-read MealPlan      $mealPlan
  * @property-read Collection<int, ShoppingListItem> $items
  */
 class ShoppingList extends Model
@@ -34,9 +37,10 @@ class ShoppingList extends Model
 
     protected $fillable = [
         'user_id',
+        'meal_plan_id',
         'name',
         'status',
-        'week_date'
+        'week_date',
     ];
 
     protected function casts(): array
@@ -50,6 +54,11 @@ class ShoppingList extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function mealPlan(): BelongsTo
+    {
+        return $this->belongsTo(MealPlan::class);
     }
 
     public function items(): HasMany

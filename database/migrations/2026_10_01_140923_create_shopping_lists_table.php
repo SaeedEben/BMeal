@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('shopping_lists', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignUuid('meal_plan_id')->constrained('meal_plans')->cascadeOnDelete();
             $table->date('week_date');
             $table->string('name', 150);
             $table->string('status')->default('active');

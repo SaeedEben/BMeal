@@ -140,5 +140,11 @@ return [
                 'destroy' => 'Meal Plan delted successfully',
             ],
         ],
+        'shopping' => [
+            'shopping_list' => [
+                'show' => 'Shopping list show',
+                'check' => 'Item in Shopping list status changed',
+            ],
+        ],
     ],
 ];

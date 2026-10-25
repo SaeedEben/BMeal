@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\Plan\MealPlanControlelr;
 use App\Http\Controllers\Api\Recipe\CategoryController;
 use App\Http\Controllers\Api\Recipe\RecipeController;
 use App\Http\Controllers\Api\Recipe\TagController;
+use App\Http\Controllers\Api\Shopping\ShoppingListController;
 use App\Http\Controllers\Api\User\UserFavoriteController;
 use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
@@ -73,10 +74,15 @@ Route::group(['prefix' => 'v1'], function () {
             Route::delete('/meal_plans/{meal_plan_item}', [MealPlanControlelr::class, 'destroy']);
 
         });
-        // Customer file routes
-        // Route::get('/customer/files/{file}', [FileController::class, 'show'])->name('customer.files.show');
-        // Route::post('/customer/files', [FileController::class, 'store']);
-        // Route::post('/customer/files/avatar', [FileController::class, 'storeAvatar']);
+
+        Route::group(['prefix' => 'shopping'], function () {
+            // Meal Plans
+            Route::post('/shopping_list', [ShoppingListController::class, 'generate']);
+            Route::get('/shopping_list', [ShoppingListController::class, 'show']);
+            Route::post('/shopping_list/check_item', [ShoppingListController::class, 'check']);
+
+        });
+
     });
 
 });
