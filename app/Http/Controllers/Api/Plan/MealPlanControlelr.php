@@ -21,7 +21,7 @@ class MealPlanControlelr extends Controller
         $weekStart = Carbon::parse($validated['week'] ?? now())->startOfWeek();
         $weekEnd = $weekStart->copy()->endOfWeek();
 
-        $mealPlans = MealPlan::query()->with('items')
+        $mealPlans = MealPlan::query()->with('items', 'items.recipe')
             ->whereBetween('week_start_date', [$weekStart, $weekEnd])
             ->get();
 

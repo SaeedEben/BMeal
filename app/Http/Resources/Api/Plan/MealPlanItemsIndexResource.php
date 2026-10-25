@@ -18,13 +18,29 @@ class MealPlanItemsIndexResource extends JsonResource
              "id"           => $this->id,
              "meal_plan_id" => $this->meal_plan_id,
              "recipe_id"    => $this->recipe_id,
-             "recipe"       => $this->recipe->name,
              "date"         => $this->date,
              "meal_type"    => $this->meal_type,
              "servings"     => $this->servings,
              "status"       => $this->status,
              "created_at"   => $this->created_at,
-             "updated_at"   => $this->updated_at
+             "updated_at"   => $this->updated_at,
+             "recipe"       => [
+                    'id'                   => $this->id,
+                    'country_id'           => $this->country_id,
+                    'name'                 => $this->name,
+                    'slug'                 => $this->slug,
+                    'description'          => $this->description,
+                    'meal_type'            => $this->meal_type,
+                    'prep_time_minutes'    => $this->prep_time_minutes,
+                    'cook_time_minutes'    => $this->cook_time_minutes,
+                    'servings'             => $this->servings,
+                    'difficulty'           => $this->difficulty,
+                    'calories_per_serving' => $this->calories_per_serving,
+                    'status'               => $this->status,
+                    'created_at'           => $this->created_at,
+                    'updated_at'           => $this->updated_at,
+                    'image'                => $this->image?->preview(),
+             ]
         ];
     }
 }
