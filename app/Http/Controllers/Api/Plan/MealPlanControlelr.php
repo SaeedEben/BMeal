@@ -22,6 +22,7 @@ class MealPlanControlelr extends Controller
         $weekEnd = $weekStart->copy()->endOfWeek();
 
         $mealPlans = MealPlan::query()->with('items', 'items.recipe', 'items.recipe.image')
+            ->where('user_id', $request->user()->id)
             ->whereBetween('week_start_date', [$weekStart, $weekEnd])
             ->get();
 
@@ -32,26 +33,34 @@ class MealPlanControlelr extends Controller
     {
         $validated = $request->validated();
 
-        $user_id = $request->user()->id;
+        $userId = $request->user()->id;
 
-        $mealPlan = DB::transaction(function () use ($user_id, $validated) {
-            $mealPlan = MealPlan::create([
-                'user_id' => $user_id,
-                'week_start_date' => $validated['week_start_date'],
-                'status' => StatusEnum::ACTIVE,
-            ]);
+        $mealPlan = DB::transaction(function () use ($userId, $validated): MealPlan {
+            DB::table('users')->where('id', $userId)->lockForUpdate()->first();
+
+            $mealPlan = MealPlan::query()
+                ->forUserWeek($userId, $validated['week_start_date'])
+                ->first();
+
+            if ($mealPlan === null) {
+                $mealPlan = MealPlan::query()->create([
+                    'user_id' => $userId,
+                    'week_start_date' => $validated['week_start_date'],
+                    'status' => StatusEnum::ACTIVE,
+                ]);
+            }
 
             foreach ($validated['items'] as $item) {
-                MealPlanItem::create([
-                    'meal_plan_id' => $mealPlan->id,
+                $mealPlan->items()->create([
                     'recipe_id' => $item['recipe_id'],
                     'date' => $item['date'],
                     'meal_type' => $item['meal_type'],
                     'servings' => $item['servings'],
                     'status' => StatusEnum::ACTIVE,
-
                 ]);
             }
+
+            return $mealPlan->load('items');
         });
 
         return $this->success($mealPlan, __('responses.api.plan.meal_plan.store'));

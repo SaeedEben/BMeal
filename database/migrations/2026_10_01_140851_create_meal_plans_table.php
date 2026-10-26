@@ -15,6 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('user_id')->constrained('users')->cascadeOnDelete();
             $table->date('week_start_date');
+            $table->unique(['user_id', 'week_start_date']);
 
             $table->string('status')->default('active');
             $table->timestamps();

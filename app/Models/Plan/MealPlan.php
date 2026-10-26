@@ -3,8 +3,10 @@
 namespace App\Models\Plan;
 
 use App\Enum\Common\StatusEnum;
+use App\Models\User\User;
 use Carbon\Carbon;
 use Database\Factories\Plan\MealPlanFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,16 +14,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Symfony\Component\Uid\Uuid;
-use App\Models\User\User;
 
 /**
- * @property Uuid|string        $id
- * @property string             $user_id
- * @property Carbon             $week_start_date
- * @property StatusEnum|string  $status
- * @property Carbon             $created_at
- * @property Carbon             $updated_at
- * Relations ----------------------------------------
+ * @property Uuid|string $id
+ * @property string $user_id
+ * @property Carbon $week_start_date
+ * @property StatusEnum|string $status
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ *                              Relations ----------------------------------------
  * @property-read User $user
  * @property-read Collection<int, MealPlanItem> $items
  */
@@ -48,6 +49,13 @@ class MealPlan extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function scopeForUserWeek(Builder $query, string $userId, string $weekStartDate): Builder
+    {
+        return $query
+            ->where('user_id', $userId)
+            ->whereDate('week_start_date', $weekStartDate);
     }
 
     public function items(): HasMany
