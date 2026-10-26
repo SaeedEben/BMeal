@@ -51,13 +51,27 @@ class MealPlanControlelr extends Controller
             }
 
             foreach ($validated['items'] as $item) {
-                $mealPlan->items()->create([
+                $date = Carbon::parse($item['date'])->toDateString();
+                $attributes = [
                     'recipe_id' => $item['recipe_id'],
-                    'date' => $item['date'],
-                    'meal_type' => $item['meal_type'],
                     'servings' => $item['servings'],
                     'status' => StatusEnum::ACTIVE,
-                ]);
+                ];
+                $mealPlanItem = $mealPlan->items()
+                    ->whereDate('date', $date)
+                    ->where('meal_type', $item['meal_type'])
+                    ->first();
+
+                if ($mealPlanItem === null) {
+                    $mealPlan->items()->create($attributes + [
+                        'date' => $date,
+                        'meal_type' => $item['meal_type'],
+                    ]);
+
+                    continue;
+                }
+
+                $mealPlanItem->update($attributes);
             }
 
             return $mealPlan->load('items');

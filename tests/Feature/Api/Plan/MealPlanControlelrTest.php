@@ -89,6 +89,29 @@ class MealPlanControlelrTest extends TestCase
             ->assertJsonPath('data.id', $mealPlanId)
             ->assertJsonCount(2, 'data.items');
 
+        $this->postJson('/api/v1/plan/meal_plans', [
+            'week_start_date' => $weekStartDate,
+            'items' => [[
+                'recipe_id' => $dinnerRecipe->id,
+                'date' => $weekStartDate.' 12:00',
+                'meal_type' => 'breakfast',
+                'servings' => 3,
+            ]],
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.id', $mealPlanId)
+            ->assertJsonCount(2, 'data.items');
+
+        $this->assertTrue(
+            MealPlan::query()->findOrFail($mealPlanId)
+                ->items()
+                ->whereDate('date', $weekStartDate)
+                ->where('meal_type', 'breakfast')
+                ->where('recipe_id', $dinnerRecipe->id)
+                ->where('servings', 3)
+                ->exists(),
+        );
+
         $this->actingAs($anotherUser, 'sanctum')
             ->postJson('/api/v1/plan/meal_plans', [
                 'week_start_date' => $weekStartDate,

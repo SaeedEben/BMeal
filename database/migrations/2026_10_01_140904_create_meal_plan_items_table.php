@@ -24,6 +24,8 @@ return new class extends Migration
 
             $table->string('status')->default('active');
             $table->timestamps();
+
+            $table->unique(['meal_plan_id', 'date', 'meal_type']);
         });
     }
 
