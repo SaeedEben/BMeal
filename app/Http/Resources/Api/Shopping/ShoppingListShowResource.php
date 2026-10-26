@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources\Api\Shopping;
 
+use App\Http\Resources\Panel\Recipe\Ingredients\IngredientsIndexResource;
+use App\Http\Resources\Panel\Recipe\Ingredients\IngredientsShowResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -20,13 +22,14 @@ class ShoppingListShowResource extends JsonResource
             'name' => $this->name,
             'status' => $this->status,
             'items' => $this->items->map(fn ($item): array => [
-                'id' => $item->id,
+                'id'            => $item->id,
                 'ingredient_id' => $item->ingredient_id,
-                'name' => $item->name,
-                'quantity' => $item->quantity,
-                'unit' => $item->unit,
-                'is_completed' => $item->is_completed,
-                'status' => $item->status,
+                'ingredient'    => new IngredientsShowResource($item['ingredient']),
+                'name'          => $item->name,
+                'quantity'      => $item->quantity,
+                'unit'          => $item->unit,
+                'is_completed'  => $item->is_completed,
+                'status'        => $item->status,
             ])->values(),
         ];
     }

@@ -24,7 +24,7 @@ class ShoppingListGenerateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'meal_plan_id' => 'required|uuid',
+            'week_start_date' => 'required|date_format:Y-m-d',
         ];
     }
 }

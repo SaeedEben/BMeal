@@ -77,8 +77,8 @@ Route::group(['prefix' => 'v1'], function () {
 
         Route::group(['prefix' => 'shopping'], function () {
             // Meal Plans
-            Route::post('/shopping_list', [ShoppingListController::class, 'generate']);
             Route::get('/shopping_list', [ShoppingListController::class, 'show']);
+            Route::post('/shopping_list', [ShoppingListController::class, 'generate']);
             Route::post('/shopping_list/check_item', [ShoppingListController::class, 'check']);
 
         });

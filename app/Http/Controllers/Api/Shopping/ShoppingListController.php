@@ -23,31 +23,35 @@ class ShoppingListController extends Controller
     {
         $weekStart = Carbon::parse($request->validated('week'))->startOfWeek()->toDateString();
         $shoppingList = ShoppingList::query()
+            ->with('items', 'items.ingredient')
             ->where('user_id', $request->user()->id)
             ->whereDate('week_date', $weekStart)
-            ->with('items')
-            ->firstOrFail();
+            ->first();
 
-        return $this->resource(new ShoppingListShowResource($shoppingList), __('responses.api.shopping.shopping_list.show'));
+        if ($shoppingList === null) {
+            return $this->success(data: [], message: __('responses.api.shopping.shopping_list.show'));
+        }
+
+        return $this->collection(new ShoppingListShowResource($shoppingList), __('responses.api.shopping.shopping_list.show'));
     }
 
     public function generate(ShoppingListGenerateRequest $request): JsonResponse
     {
-        $mealPlanId = $request->validated('meal_plan_id');
+        $weekStart = Carbon::parse($request->validated('week_start_date'))->startOfWeek();
+        $weekEnd = $weekStart->copy()->endOfWeek();
         $userId = $request->user()->id;
 
-        $shoppingList = DB::transaction(function () use ($mealPlanId, $userId): ShoppingList {
+        $shoppingList = DB::transaction(function () use ($weekStart, $weekEnd, $userId): ShoppingList {
             DB::table('users')->where('id', $userId)->lockForUpdate()->first();
 
-            $mealPlan = MealPlan::query()
+            $mealPlans = MealPlan::query()
                 ->where('user_id', $userId)
                 ->where('status', StatusEnum::ACTIVE->value)
-                ->findOrFail($mealPlanId);
-            $weekStart = $mealPlan->week_start_date->copy()->startOfWeek();
-            $weekEnd = $weekStart->copy()->endOfWeek();
+                ->whereBetween('week_start_date', [$weekStart->toDateString(), $weekEnd->toDateString()])
+                ->get();
 
             $mealPlanItems = MealPlanItem::query()
-                ->where('meal_plan_id', $mealPlan->id)
+                ->whereIn('meal_plan_id', $mealPlans->modelKeys())
                 ->where('status', StatusEnum::ACTIVE->value)
                 ->whereBetween('date', [$weekStart->toDateString(), $weekEnd->toDateString()])
                 ->with([
@@ -85,17 +89,18 @@ class ShoppingListController extends Controller
                 }
             }
 
-            $shoppingList = ShoppingList::query()->firstOrCreate(
+            $shoppingList = ShoppingList::query()->firstOrNew(
                 [
                     'user_id' => $userId,
-                    'meal_plan_id' => $mealPlan->id,
                     'week_date' => $weekStart->toDateString(),
                 ],
-                [
-                    'name' => 'Shopping List',
-                    'status' => StatusEnum::ACTIVE->value,
-                ],
             );
+            $shoppingList->fill([
+                'meal_plan_id' => $mealPlans->first()?->id,
+                'name' => 'Shopping List',
+                'status' => StatusEnum::ACTIVE->value,
+            ]);
+            $shoppingList->save();
 
             $existingRecipeItems = $shoppingList->items()
                 ->whereNotNull('ingredient_id')

@@ -18,7 +18,7 @@ use Symfony\Component\Uid\Uuid;
 /**
  * @property Uuid|string $id
  * @property string $user_id
- * @property string $meal_plan_id
+ * @property string|null $meal_plan_id
  * @property string $name
  * @property Carbon $week_date
  * @property StatusEnum|string $status
@@ -27,7 +27,7 @@ use Symfony\Component\Uid\Uuid;
  *
  * Relations ---------------------------------------
  * @property-read User          $user
- * @property-read MealPlan      $mealPlan
+ * @property-read MealPlan|null $mealPlan
  * @property-read Collection<int, ShoppingListItem> $items
  */
 class ShoppingList extends Model

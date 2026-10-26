@@ -24,9 +24,9 @@ class ShoppingListCheckRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'items' => 'required|array|min:1',
-            'items.*' => 'required|array',
-            'items.*.item_id' => 'required|uuid|distinct',
+            'items'                => 'required|array|min:1',
+            'items.*'              => 'required|array',
+            'items.*.item_id'      => 'required|uuid|distinct',
             'items.*.is_completed' => 'required|boolean',
         ];
     }

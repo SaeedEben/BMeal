@@ -25,7 +25,7 @@ class MealPlanStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'week_start_date' => 'required|date_format:Y-m-d|after_or_equal:tomorrow',
+            'week_start_date' => 'required|date_format:Y-m-d|after_or_equal:today',
             'items' => 'required|array',
             'items.*' => 'required|array',
             'items.*.recipe_id' => 'required|uuid|exists:recipes,id',
