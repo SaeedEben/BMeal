@@ -13,7 +13,6 @@ use App\Models\Plan\MealPlanItem;
 use App\Models\Shopping\ShoppingList;
 use App\Models\Shopping\ShoppingListItem;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -159,26 +158,53 @@ class ShoppingListController extends Controller
 
     public function check(ShoppingListCheckRequest $request): JsonResponse
     {
-        $items = $request->validated('items');
+        $validated = $request->validated();
+        $items = $validated['items'];
         $userId = $request->user()->id;
+        $weekStart = Carbon::parse($validated['week'])->startOfWeek();
+        $isAllDay = $validated['date'] === 'all_day';
+        $dayOffsets = [
+            'monday' => 0,
+            'tuesday' => 1,
+            'wednesday' => 2,
+            'thursday' => 3,
+            'friday' => 4,
+            'saturday' => 5,
+            'sunday' => 6,
+        ];
+        $date = $isAllDay
+            ? null
+            : $weekStart->copy()->addDays($dayOffsets[$validated['date']])->toDateString();
 
-        DB::transaction(function () use ($items, $userId): void {
-            $shoppingListItems = ShoppingListItem::query()
-                ->whereIn('id', array_column($items, 'item_id'))
-                ->whereHas('shoppingList', fn (Builder $query): Builder => $query->where('user_id', $userId))
+        DB::transaction(function () use ($items, $userId, $weekStart, $isAllDay, $date): void {
+            $shoppingList = ShoppingList::query()
+                ->where('user_id', $userId)
+                ->whereDate('week_date', $weekStart->toDateString())
                 ->lockForUpdate()
-                ->get()
-                ->keyBy('id');
+                ->first();
 
-            abort_unless($shoppingListItems->count() === count($items), 404);
+            abort_if($shoppingList === null, 404);
+
+            $shoppingListItemsQuery = $shoppingList->items()
+                ->whereIn('name', array_column($items, 'item_name'));
+
+            if (! $isAllDay) {
+                $shoppingListItemsQuery->whereDate('date', $date);
+            }
+
+            $shoppingListItems = $shoppingListItemsQuery->lockForUpdate()->get();
+
+            abort_unless($shoppingListItems->pluck('name')->unique()->count() === count($items), 404);
 
             foreach ($items as $item) {
-                $shoppingListItem = $shoppingListItems->get($item['item_id']);
+                $shoppingListItemQuery = $shoppingList->items()
+                    ->where('name', $item['item_name']);
 
-                ShoppingListItem::query()
-                    ->where('shopping_list_id', $shoppingListItem->shopping_list_id)
-                    ->where('name', $shoppingListItem->name)
-                    ->update(['is_completed' => $item['is_completed']]);
+                if (! $isAllDay) {
+                    $shoppingListItemQuery->whereDate('date', $date);
+                }
+
+                $shoppingListItemQuery->update(['is_completed' => $item['is_completed']]);
             }
         });
 

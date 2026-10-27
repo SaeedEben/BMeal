@@ -83,7 +83,7 @@ class ShoppingListControllerTest extends TestCase
             ->assertJsonPath('success', true)
             ->assertJsonPath('data', null);
 
-        $response = $this->getJson('/api/v1/shopping/shopping_list?week='.$weekStart->toDateString())
+        $this->getJson('/api/v1/shopping/shopping_list?week='.$weekStart->toDateString())
             ->assertOk()
             ->assertJsonCount(1, 'data.items')
             ->assertJsonPath('data.items.0.name', 'Salt')
@@ -91,8 +91,10 @@ class ShoppingListControllerTest extends TestCase
             ->assertJsonPath('data.items.0.unit', 'pc');
 
         $this->postJson('/api/v1/shopping/shopping_list/check_item', [
+            'date' => 'all_day',
+            'week' => $weekStart->toDateString(),
             'items' => [[
-                'item_id' => $response->json('data.items.0.id'),
+                'item_name' => 'Salt',
                 'is_completed' => true,
             ]],
         ])->assertOk();
@@ -244,52 +246,70 @@ class ShoppingListControllerTest extends TestCase
     {
         $user = $this->createCustomer();
         $otherUser = $this->createCustomer();
-        $weekStart = now()->startOfWeek()->toDateString();
+        $weekStart = now()->startOfWeek();
         $shoppingList = ShoppingList::query()->create([
             'user_id' => $user->id,
-            'week_date' => $weekStart,
+            'week_date' => $weekStart->toDateString(),
             'name' => 'Shopping List',
             'status' => StatusEnum::ACTIVE,
         ]);
         $otherUsersShoppingList = ShoppingList::query()->create([
             'user_id' => $otherUser->id,
-            'week_date' => $weekStart,
+            'week_date' => $weekStart->toDateString(),
             'name' => 'Other Shopping List',
             'status' => StatusEnum::ACTIVE,
         ]);
         $firstItem = $shoppingList->items()->create([
             'name' => 'Avocado',
-            'date' => $weekStart,
+            'date' => $weekStart->toDateString(),
+            'is_completed' => false,
+            'status' => StatusEnum::ACTIVE,
+        ]);
+        $secondAvocadoItem = $shoppingList->items()->create([
+            'name' => 'Avocado',
+            'date' => $weekStart->copy()->addDays(2)->toDateString(),
             'is_completed' => false,
             'status' => StatusEnum::ACTIVE,
         ]);
         $secondItem = $shoppingList->items()->create([
             'name' => 'Tomato',
-            'date' => $weekStart,
+            'date' => $weekStart->toDateString(),
             'is_completed' => true,
             'status' => StatusEnum::ACTIVE,
         ]);
         $foreignItem = $otherUsersShoppingList->items()->create([
             'name' => 'Onion',
-            'date' => $weekStart,
+            'date' => $weekStart->toDateString(),
             'is_completed' => false,
             'status' => StatusEnum::ACTIVE,
         ]);
 
         $this->actingAs($user, 'sanctum')
             ->postJson('/api/v1/shopping/shopping_list/check_item', [
+                'date' => 'monday',
+                'week' => $weekStart->toDateString(),
                 'items' => [
-                    ['item_id' => $firstItem->id, 'is_completed' => 'done'],
+                    ['item_name' => 'Avocado', 'is_completed' => 'done'],
                 ],
             ])
             ->assertUnprocessable()
             ->assertJsonValidationErrors('items.0.is_completed');
 
+        $this->postJson('/api/v1/shopping/shopping_list/check_item', [
+            'date' => 'funday',
+            'week' => $weekStart->toDateString(),
+            'items' => [
+                ['item_name' => 'Avocado', 'is_completed' => true],
+            ],
+        ])->assertUnprocessable()->assertJsonValidationErrors('date');
+
         $this->actingAs($user, 'sanctum')
             ->postJson('/api/v1/shopping/shopping_list/check_item', [
+                'date' => 'monday',
+                'week' => $weekStart->toDateString(),
                 'items' => [
-                    ['item_id' => $firstItem->id, 'is_completed' => true],
-                    ['item_id' => $secondItem->id, 'is_completed' => false],
+                    ['item_name' => 'Avocado', 'is_completed' => true],
+                    ['item_name' => 'Tomato', 'is_completed' => false],
                 ],
             ])
             ->assertOk()
@@ -300,20 +320,43 @@ class ShoppingListControllerTest extends TestCase
             'is_completed' => true,
         ]);
         $this->assertDatabaseHas('shopping_list_items', [
+            'id' => $secondAvocadoItem->id,
+            'is_completed' => false,
+        ]);
+        $this->assertDatabaseHas('shopping_list_items', [
             'id' => $secondItem->id,
             'is_completed' => false,
         ]);
 
         $this->postJson('/api/v1/shopping/shopping_list/check_item', [
+            'date' => 'All day',
+            'week' => $weekStart->toDateString(),
             'items' => [
-                ['item_id' => $firstItem->id, 'is_completed' => false],
-                ['item_id' => $foreignItem->id, 'is_completed' => true],
+                ['item_name' => 'Avocado', 'is_completed' => false],
+            ],
+        ])->assertOk();
+
+        $this->assertDatabaseHas('shopping_list_items', [
+            'id' => $firstItem->id,
+            'is_completed' => false,
+        ]);
+        $this->assertDatabaseHas('shopping_list_items', [
+            'id' => $secondAvocadoItem->id,
+            'is_completed' => false,
+        ]);
+
+        $this->postJson('/api/v1/shopping/shopping_list/check_item', [
+            'date' => 'all_day',
+            'week' => $weekStart->toDateString(),
+            'items' => [
+                ['item_name' => 'Avocado', 'is_completed' => true],
+                ['item_name' => 'Onion', 'is_completed' => true],
             ],
         ])->assertNotFound();
 
         $this->assertDatabaseHas('shopping_list_items', [
             'id' => $firstItem->id,
-            'is_completed' => true,
+            'is_completed' => false,
         ]);
         $this->assertDatabaseHas('shopping_list_items', [
             'id' => $foreignItem->id,

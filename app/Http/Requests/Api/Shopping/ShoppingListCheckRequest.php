@@ -5,6 +5,7 @@ namespace App\Http\Requests\Api\Shopping;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class ShoppingListCheckRequest extends FormRequest
 {
@@ -16,6 +17,15 @@ class ShoppingListCheckRequest extends FormRequest
         return Auth::check();
     }
 
+    protected function prepareForValidation(): void
+    {
+        $date = $this->input('date');
+
+        if (is_string($date)) {
+            $this->merge(['date' => str_replace(' ', '_', strtolower(trim($date)))]);
+        }
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -24,10 +34,16 @@ class ShoppingListCheckRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'items'                => 'required|array|min:1',
-            'items.*'              => 'required|array',
-            'items.*.item_id'      => 'required|uuid|distinct',
-            'items.*.is_completed' => 'required|boolean',
+            'date' => [
+                'required',
+                'string',
+                Rule::in(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday', 'all_day']),
+            ],
+            'week' => ['required', 'date'],
+            'items' => ['required', 'array', 'min:1'],
+            'items.*' => ['required', 'array'],
+            'items.*.item_name' => ['required', 'string', 'max:150', 'distinct'],
+            'items.*.is_completed' => ['required', 'boolean'],
         ];
     }
 }
