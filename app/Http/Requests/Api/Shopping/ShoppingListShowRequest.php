@@ -25,6 +25,7 @@ class ShoppingListShowRequest extends FormRequest
     {
         return [
             'week' => 'required|date',
+            'date' => 'nullable|date_format:Y-m-d',
         ];
     }
 }

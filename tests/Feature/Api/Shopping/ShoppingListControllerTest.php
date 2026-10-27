@@ -40,14 +40,64 @@ class ShoppingListControllerTest extends TestCase
         $this->actingAs($user, 'sanctum')
             ->postJson('/api/v1/shopping/shopping_list', ['week_start_date' => $weekStart])
             ->assertOk()
-            ->assertJsonPath('data.week_date', $weekStart)
-            ->assertJsonCount(0, 'data.items');
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data', null);
 
         $this->assertDatabaseHas('shopping_lists', [
             'user_id' => $user->id,
             'week_date' => $weekStart,
-            'meal_plan_id' => null,
         ]);
+    }
+
+    public function test_show_combines_same_name_items_across_dates_and_generate_returns_success_only(): void
+    {
+        $user = $this->createCustomer();
+        $weekStart = now()->setDate(2026, 11, 2)->startOfWeek();
+        $firstSalt = Ingredient::query()->create([
+            'name' => 'Salt',
+            'slug' => 'salt-first',
+        ]);
+        $secondSalt = Ingredient::query()->create([
+            'name' => 'Salt',
+            'slug' => 'salt-second',
+        ]);
+        $piece = Unit::query()->create([
+            'name' => 'Piece',
+            'symbol' => 'pc',
+            'slug' => 'piece',
+            'type' => 'count',
+        ]);
+        $firstRecipe = $this->createRecipe('First salt recipe');
+        $secondRecipe = $this->createRecipe('Second salt recipe');
+
+        $this->addIngredient($firstRecipe, $firstSalt, $piece, '2.00');
+        $this->addIngredient($secondRecipe, $secondSalt, $piece, '3.00');
+
+        $mealPlan = $this->createMealPlan($user, $weekStart->toDateString());
+        $this->addMeal($mealPlan, $firstRecipe, $weekStart->toDateString());
+        $this->addMeal($mealPlan, $secondRecipe, $weekStart->copy()->addDay()->toDateString());
+
+        $this->actingAs($user, 'sanctum')
+            ->postJson('/api/v1/shopping/shopping_list', ['week_start_date' => $weekStart->toDateString()])
+            ->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data', null);
+
+        $response = $this->getJson('/api/v1/shopping/shopping_list?week='.$weekStart->toDateString())
+            ->assertOk()
+            ->assertJsonCount(1, 'data.items')
+            ->assertJsonPath('data.items.0.name', 'Salt')
+            ->assertJsonPath('data.items.0.quantity', '5.00')
+            ->assertJsonPath('data.items.0.unit', 'pc');
+
+        $this->postJson('/api/v1/shopping/shopping_list/check_item', [
+            'items' => [[
+                'item_id' => $response->json('data.items.0.id'),
+                'is_completed' => true,
+            ]],
+        ])->assertOk();
+
+        $this->assertSame(2, ShoppingList::query()->sole()->items()->where('is_completed', true)->count());
     }
 
     public function test_weekly_list_aggregates_and_reconciles_the_authenticated_users_meal_plan(): void
@@ -87,8 +137,6 @@ class ShoppingListControllerTest extends TestCase
         $mealPlan = $this->createMealPlan($user, $weekStart->toDateString());
         $secondMeal = $this->addMeal($mealPlan, $secondRecipe, $weekStart->copy()->addDays(2)->toDateString());
         $this->addMeal($mealPlan, $firstRecipe, $weekStart->copy()->addDays(1)->toDateString());
-        $secondMealPlan = $this->createMealPlan($user, $weekStart->toDateString());
-        $this->addMeal($secondMealPlan, $thirdRecipe, $weekStart->copy()->addDays(3)->toDateString());
         $otherUsersMealPlan = $this->createMealPlan($otherUser, $weekStart->toDateString());
         $this->addMeal($otherUsersMealPlan, $otherUsersRecipe, $weekStart->toDateString());
 
@@ -97,26 +145,38 @@ class ShoppingListControllerTest extends TestCase
             ->assertUnprocessable()
             ->assertJsonValidationErrors('week_start_date');
 
-        $response = $this->actingAs($user, 'sanctum')
+        $this->actingAs($user, 'sanctum')
             ->postJson('/api/v1/shopping/shopping_list', ['week_start_date' => $weekStart->toDateString()]);
+
+        $this->assertDatabaseCount('shopping_lists', 1);
+
+        $response = $this->getJson('/api/v1/shopping/shopping_list?week='.$weekStart->toDateString());
 
         $response
             ->assertOk()
             ->assertJsonPath('data.week_date', $weekStart->toDateString())
-            ->assertJsonCount(3, 'data.items')
-            ->assertJsonFragment(['name' => 'Avocado', 'quantity' => '2.00', 'unit' => 'pc'])
-            ->assertJsonFragment(['name' => 'Onion', 'quantity' => '3.00', 'unit' => 'pc']);
+            ->assertJsonCount(2, 'data.items')
+            ->assertJsonFragment([
+                'name' => 'Avocado',
+                'quantity' => '2.00',
+                'unit' => 'pc',
+                'date' => $weekStart->copy()->addDay()->toDateString(),
+            ]);
 
         $shoppingList = ShoppingList::query()->sole();
         $this->getJson('/api/v1/shopping/shopping_list?week='.$weekStart->copy()->addDays(3)->toDateString())
             ->assertOk()
             ->assertJsonPath('data.id', $shoppingList->id)
-            ->assertJsonCount(3, 'data.items');
+            ->assertJsonCount(2, 'data.items');
 
-        $avocadoItem = $shoppingList->items()->where('ingredient_id', $avocado->id)->sole();
+        $avocadoItem = $shoppingList->items()
+            ->where('ingredient_id', $avocado->id)
+            ->whereDate('date', $weekStart->copy()->addDay()->toDateString())
+            ->sole();
         $avocadoItem->update(['is_completed' => true]);
         $shoppingList->items()->create([
             'name' => 'Olive oil',
+            'date' => $weekStart->copy()->addDays(4)->toDateString(),
             'quantity' => '1.00',
             'unit' => 'bottle',
             'is_completed' => false,
@@ -125,21 +185,33 @@ class ShoppingListControllerTest extends TestCase
         $secondMeal->delete();
         $this->addMeal($mealPlan, $thirdRecipe, $weekStart->copy()->addDays(3)->toDateString());
 
-        $updatedResponse = $this->postJson('/api/v1/shopping/shopping_list', ['week_start_date' => $weekStart->toDateString()]);
+        $this->postJson('/api/v1/shopping/shopping_list', ['week_start_date' => $weekStart->toDateString()])
+            ->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data', null);
+
+        $updatedResponse = $this->getJson('/api/v1/shopping/shopping_list?week='.$weekStart->toDateString());
 
         $updatedResponse
             ->assertOk()
             ->assertJsonPath('data.id', $shoppingList->id)
             ->assertJsonCount(3, 'data.items')
-            ->assertJsonFragment(['name' => 'Avocado', 'quantity' => '1.00', 'unit' => 'pc'])
+            ->assertJsonFragment([
+                'name' => 'Avocado',
+                'quantity' => '1.00',
+                'unit' => 'pc',
+                'date' => $weekStart->copy()->addDay()->toDateString(),
+            ])
             ->assertJsonFragment(['name' => 'Olive oil', 'quantity' => '1.00', 'unit' => 'bottle'])
-            ->assertJsonFragment(['name' => 'Onion', 'quantity' => '6.00', 'unit' => 'pc']);
+            ->assertJsonFragment([
+                'name' => 'Onion',
+                'quantity' => '3.00',
+                'unit' => 'pc',
+                'date' => $weekStart->copy()->addDays(3)->toDateString(),
+            ]);
 
         $this->assertDatabaseCount('shopping_lists', 1);
-        $this->assertDatabaseHas('shopping_lists', [
-            'id' => $shoppingList->id,
-            'meal_plan_id' => $mealPlan->id,
-        ]);
+        $this->assertDatabaseHas('shopping_lists', ['id' => $shoppingList->id]);
         $this->assertDatabaseMissing('shopping_list_items', [
             'shopping_list_id' => $shoppingList->id,
             'ingredient_id' => $tomato->id,
@@ -157,7 +229,6 @@ class ShoppingListControllerTest extends TestCase
 
         ShoppingList::query()->create([
             'user_id' => $otherUser->id,
-            'meal_plan_id' => $otherUsersMealPlan->id,
             'week_date' => $weekStart->toDateString(),
             'name' => 'Other user shopping list',
             'status' => StatusEnum::ACTIVE,
@@ -174,34 +245,33 @@ class ShoppingListControllerTest extends TestCase
         $user = $this->createCustomer();
         $otherUser = $this->createCustomer();
         $weekStart = now()->startOfWeek()->toDateString();
-        $mealPlan = $this->createMealPlan($user, $weekStart);
-        $otherUsersMealPlan = $this->createMealPlan($otherUser, $weekStart);
         $shoppingList = ShoppingList::query()->create([
             'user_id' => $user->id,
-            'meal_plan_id' => $mealPlan->id,
             'week_date' => $weekStart,
             'name' => 'Shopping List',
             'status' => StatusEnum::ACTIVE,
         ]);
         $otherUsersShoppingList = ShoppingList::query()->create([
             'user_id' => $otherUser->id,
-            'meal_plan_id' => $otherUsersMealPlan->id,
             'week_date' => $weekStart,
             'name' => 'Other Shopping List',
             'status' => StatusEnum::ACTIVE,
         ]);
         $firstItem = $shoppingList->items()->create([
             'name' => 'Avocado',
+            'date' => $weekStart,
             'is_completed' => false,
             'status' => StatusEnum::ACTIVE,
         ]);
         $secondItem = $shoppingList->items()->create([
             'name' => 'Tomato',
+            'date' => $weekStart,
             'is_completed' => true,
             'status' => StatusEnum::ACTIVE,
         ]);
         $foreignItem = $otherUsersShoppingList->items()->create([
             'name' => 'Onion',
+            'date' => $weekStart,
             'is_completed' => false,
             'status' => StatusEnum::ACTIVE,
         ]);

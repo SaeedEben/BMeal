@@ -3,6 +3,7 @@
 namespace App\Models\Shopping;
 
 use App\Enum\Common\StatusEnum;
+use App\Models\Recipe\Ingredient;
 use Carbon\Carbon;
 use Database\Factories\ShoppingListItemFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -10,7 +11,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Symfony\Component\Uid\Uuid;
-use App\Models\Recipe\Ingredient;
 
 /**
  * @property Uuid|string $id
@@ -19,6 +19,7 @@ use App\Models\Recipe\Ingredient;
  * @property string $name
  * @property string|null $quantity
  * @property string|null $unit
+ * @property Carbon $date
  * @property bool|null $is_completed
  * @property StatusEnum|string $status
  * @property Carbon $created_at
@@ -37,6 +38,7 @@ class ShoppingListItem extends Model
         'name',
         'quantity',
         'unit',
+        'date',
         'is_completed',
         'status',
     ];
@@ -45,6 +47,7 @@ class ShoppingListItem extends Model
     {
         return [
             'quantity' => 'decimal:2',
+            'date' => 'date',
             'is_completed' => 'boolean',
             'status' => StatusEnum::class,
         ];

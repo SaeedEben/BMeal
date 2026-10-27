@@ -3,7 +3,6 @@
 namespace App\Models\Shopping;
 
 use App\Enum\Common\StatusEnum;
-use App\Models\Plan\MealPlan;
 use App\Models\User\User;
 use Carbon\Carbon;
 use Database\Factories\ShoppingListFactory;
@@ -18,7 +17,6 @@ use Symfony\Component\Uid\Uuid;
 /**
  * @property Uuid|string $id
  * @property string $user_id
- * @property string|null $meal_plan_id
  * @property string $name
  * @property Carbon $week_date
  * @property StatusEnum|string $status
@@ -27,7 +25,6 @@ use Symfony\Component\Uid\Uuid;
  *
  * Relations ---------------------------------------
  * @property-read User          $user
- * @property-read MealPlan|null $mealPlan
  * @property-read Collection<int, ShoppingListItem> $items
  */
 class ShoppingList extends Model
@@ -37,7 +34,6 @@ class ShoppingList extends Model
 
     protected $fillable = [
         'user_id',
-        'meal_plan_id',
         'name',
         'status',
         'week_date',
@@ -54,11 +50,6 @@ class ShoppingList extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function mealPlan(): BelongsTo
-    {
-        return $this->belongsTo(MealPlan::class);
     }
 
     public function items(): HasMany

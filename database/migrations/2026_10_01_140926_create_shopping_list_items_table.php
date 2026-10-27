@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreignUuid('shopping_list_id')->constrained('shopping_lists')->cascadeOnDelete();
             $table->foreignUuid('ingredient_id')->nullable()->constrained('ingredients')->nullOnDelete();
 
+            $table->date('date');
+            $table->index(['shopping_list_id', 'date']);
             $table->string('name', 150);
             $table->decimal('quantity', 10, 2)->nullable();
             $table->string('unit', 50)->nullable();
