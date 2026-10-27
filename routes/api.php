@@ -56,6 +56,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::group(['prefix' => 'country'], function () {
             // Countries
             Route::get('/list', [CountryController::class, 'list']);
+            Route::get('/category', [CountryController::class, 'countryCategory']);
         });
 
         Route::group(['prefix' => 'user'], function () {

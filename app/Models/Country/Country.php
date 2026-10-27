@@ -3,14 +3,17 @@
 namespace App\Models\Country;
 
 use App\Enum\Common\StatusEnum;
+use App\Models\File\File;
+use App\Models\Recipe\Recipe;
 use Carbon\Carbon;
 use Database\Factories\Country\CountryFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Symfony\Component\Uid\Uuid;
-use App\Models\File\File;
 
 /**
  * @property Uuid|string $id
@@ -25,6 +28,7 @@ use App\Models\File\File;
  *
  * Relations ---------------------------
  * @property-read File $flag
+ * @property-read Collection<int, Recipe> $recipes
  */
 class Country extends Model
 {
@@ -51,5 +55,10 @@ class Country extends Model
     public function flag(): BelongsTo
     {
         return $this->belongsTo(File::class, 'flag_id');
+    }
+
+    public function recipes(): HasMany
+    {
+        return $this->hasMany(Recipe::class);
     }
 }

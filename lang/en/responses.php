@@ -146,5 +146,8 @@ return [
                 'check' => 'Item in Shopping list status changed',
             ],
         ],
+        'country' => [
+            'category' => 'Country category list.',
+        ],
     ],
 ];
