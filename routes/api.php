@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\Country\CountryController;
 use App\Http\Controllers\Api\Customer\CustomerController;
+use App\Http\Controllers\Api\Dashboard\DashboardController;
 use App\Http\Controllers\Api\Plan\MealPlanControlelr;
 use App\Http\Controllers\Api\Recipe\CategoryController;
 use App\Http\Controllers\Api\Recipe\RecipeController;
@@ -77,10 +78,16 @@ Route::group(['prefix' => 'v1'], function () {
         });
 
         Route::group(['prefix' => 'shopping'], function () {
-            // Meal Plans
+            // Shopping List
             Route::get('/shopping_list', [ShoppingListController::class, 'show']);
             Route::post('/shopping_list', [ShoppingListController::class, 'generate']);
             Route::post('/shopping_list/check_item', [ShoppingListController::class, 'check']);
+
+        });
+
+        Route::group(['prefix' => 'dashboard'], function () {
+            // Dashboard
+            Route::get('/', [DashboardController::class, 'dashboardData']);
 
         });
 

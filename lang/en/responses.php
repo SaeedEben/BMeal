@@ -147,7 +147,10 @@ return [
             ],
         ],
         'country' => [
-            'category' => 'Country category list.',
+            'category' => 'Country category list',
+        ],
+        'dashboard' => [
+            'data' => 'Data for dashboard',
         ],
     ],
 ];
