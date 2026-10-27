@@ -25,13 +25,13 @@ class MealPlanStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'week_start_date' => 'required|date_format:Y-m-d|after_or_equal:today',
-            'items' => 'required|array',
-            'items.*' => 'required|array',
+            'week_start_date'   => 'required|date_format:Y-m-d',
+            'items'             => 'required|array',
+            'items.*'           => 'required|array',
             'items.*.recipe_id' => 'required|uuid|exists:recipes,id',
-            'items.*.date' => 'required|date_format:Y-m-d H:i',
+            'items.*.date'      => 'required|date_format:Y-m-d H:i|after_or_equal:today',
             'items.*.meal_type' => 'required|string|in:'.implode(',', array_column(MealTypeEnum::cases(), 'value')),
-            'items.*.servings' => 'required|integer',
+            'items.*.servings'  => 'required|integer',
         ];
     }
 }
