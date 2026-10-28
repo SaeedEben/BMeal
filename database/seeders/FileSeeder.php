@@ -20,7 +20,6 @@ class FileSeeder extends Seeder
     {
         $countryFlags = [
             'GB' => 'England.png',
-            'US' => 'USA.png',
             'MX' => 'Mexico.jpg',
             'ES' => 'Spain.png',
             'IT' => 'Italy.png',

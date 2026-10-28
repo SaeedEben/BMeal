@@ -13,7 +13,7 @@ class CountrySeeder extends Seeder
     public function run(): void
     {
         $countries = [
-            ['name' => 'England', 'code' => 'GB', 'slug' => 'england', 'description' => 'English cuisine features hearty, comforting dishes made with seasonal ingredients, roasted meats, potatoes, and traditional sauces. From fish and chips to shepherd’s pie and Sunday roasts, its meals reflect a rich culinary heritage.'],
+            ['name' => 'England', 'code' => 'GB', 'slug' => 'england', 'description' => 'English cuisine features hearty, comforting dishes made with seasonal ingredients, roasted meats, potatoes, and traditional sauces. From fish and chips to shepherds pie and Sunday roasts, its meals reflect a rich culinary heritage.'],
             ['name' => 'Mexico', 'code' => 'MX', 'slug' => 'mexico' , 'description' => 'Mexican cuisine combines bold spices, fresh chilies, corn, beans, tomatoes, and avocados. Traditional dishes such as tacos and enchiladas offer vibrant flavors and rich cultural heritage.'],
             ['name' => 'Spain', 'code' => 'ES', 'slug' => 'spain' , 'description' => 'Spanish cuisine celebrates fresh seafood, olive oil, tomatoes, rice, and aromatic spices. From paella and tapas to traditional stews, its dishes showcase vibrant Mediterranean flavors and regional diversity.'],
             ['name' => 'Italy', 'code' => 'IT', 'slug' => 'italy' , 'description' => 'Italian cuisine celebrates fresh ingredients, olive oil, herbs, pasta, and regional cheeses. From classic pizzas to creamy risottos, its dishes emphasize simplicity and authentic Mediterranean flavors.'],
