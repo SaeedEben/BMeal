@@ -73,6 +73,11 @@ class ShoppingListController extends Controller
             $aggregatedIngredients = [];
 
             foreach ($mealPlanItems as $mealPlanItem) {
+                $recipeServings = $mealPlanItem->recipe->servings;
+                $servingsMultiplier = $recipeServings !== null && $recipeServings > 0
+                    ? ($mealPlanItem->servings ?? $recipeServings) / $recipeServings
+                    : 1;
+
                 foreach ($mealPlanItem->recipe->recipeIngredients as $recipeIngredient) {
                     $ingredient = $recipeIngredient->ingredient;
 
@@ -94,7 +99,9 @@ class ShoppingListController extends Controller
                     ];
 
                     if ($recipeIngredient->quantity !== null) {
-                        $aggregatedIngredients[$key]['quantity_hundredths'] += (int) round((float) $recipeIngredient->quantity * 100);
+                        $aggregatedIngredients[$key]['quantity_hundredths'] += (int) round(
+                            (float) $recipeIngredient->quantity * $servingsMultiplier * 100,
+                        );
                         $aggregatedIngredients[$key]['has_quantity'] = true;
                     }
                 }

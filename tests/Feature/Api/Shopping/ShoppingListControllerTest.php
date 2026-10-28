@@ -242,6 +242,37 @@ class ShoppingListControllerTest extends TestCase
             ->assertJsonCount(3, 'data.items');
     }
 
+    public function test_generate_scales_ingredient_quantities_to_the_meal_plan_servings(): void
+    {
+        $user = $this->createCustomer();
+        $weekStart = now()->startOfWeek();
+        $ingredient = Ingredient::query()->create([
+            'name' => 'Flour',
+            'slug' => 'flour',
+        ]);
+        $cup = Unit::query()->create([
+            'name' => 'Cup',
+            'symbol' => 'cup',
+            'slug' => 'cup',
+            'type' => 'volume',
+        ]);
+        $recipe = $this->createRecipe('Bread');
+        $recipe->update(['servings' => 4]);
+        $this->addIngredient($recipe, $ingredient, $cup, '2.00');
+        $mealPlan = $this->createMealPlan($user, $weekStart->toDateString());
+        $this->addMeal($mealPlan, $recipe, $weekStart->toDateString(), 2);
+
+        $this->actingAs($user, 'sanctum')
+            ->postJson('/api/v1/shopping/shopping_list', ['week_start_date' => $weekStart->toDateString()])
+            ->assertOk();
+
+        $this->assertDatabaseHas('shopping_list_items', [
+            'name' => 'Flour',
+            'quantity' => '1.00',
+            'unit' => 'cup',
+        ]);
+    }
+
     public function test_check_updates_owned_items_and_rejects_foreign_items_atomically(): void
     {
         $user = $this->createCustomer();
@@ -404,14 +435,14 @@ class ShoppingListControllerTest extends TestCase
         ]);
     }
 
-    private function addMeal(MealPlan $mealPlan, Recipe $recipe, string $date): MealPlanItem
+    private function addMeal(MealPlan $mealPlan, Recipe $recipe, string $date, int $servings = 1): MealPlanItem
     {
         return MealPlanItem::query()->create([
             'meal_plan_id' => $mealPlan->id,
             'recipe_id' => $recipe->id,
             'date' => $date,
             'meal_type' => 'dinner',
-            'servings' => 1,
+            'servings' => $servings,
             'status' => StatusEnum::ACTIVE,
         ]);
     }
